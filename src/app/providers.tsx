@@ -5,7 +5,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { theme } from "../theme";
-import { AppProvider } from "../context/AppContext";
+import { AppProvider } from "../context/AppProvider";
 import { ErrorBoundary } from "../components/common/ErrorBoundary";
 import { Header } from "../layout/Header";
 import { Footer } from "../layout/Footer";
