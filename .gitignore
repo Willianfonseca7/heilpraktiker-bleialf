@@ -3,6 +3,8 @@ node_modules/
 
 # Build
 dist/
+.next/
+out/
 
 # Logs
 npm-debug.log*
@@ -12,6 +14,10 @@ yarn-error.log*
 # Env
 .env
 .env.local
+.env.*.local
+
+# Vercel
+.vercel
 
 # OS
 .DS_Store
