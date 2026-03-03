@@ -1,5 +1,3 @@
-"use client";
-
 import { Box, Typography } from "@mui/material";
 import LocalFloristOutlinedIcon from "@mui/icons-material/LocalFloristOutlined";
 import { HeroSlider } from "./components/HeroSlider";
