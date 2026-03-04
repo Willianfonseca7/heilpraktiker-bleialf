@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model TestTable {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+}
+model Patient {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String?  @unique
+  phone     String?
+  createdAt DateTime @default(now())
+}
