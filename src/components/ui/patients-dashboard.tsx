@@ -1,166 +1,251 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Modal from "@/components/Modal";
+import PatientForm from "@/components/PatientForm";
 
-type PatientDTO = {
-  id: string;
+type Patient = {
+  id: string | number;
   firstName: string;
   lastName: string;
   email: string | null;
-  phone: string | null;
-  createdAt: string; // ISO
+  phone?: string | null;
+  createdAt: string | Date;
+
+  // campos novos do formulário (podem não existir nos pacientes vindos do banco)
+  birthDate?: string; // yyyy-mm-dd
+  insurancePlan?: string; // gesetzlich | privat | selbstzahler | etc
 };
 
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleString("de-DE", {
-    year: "numeric",
-    month: "2-digit",
+type PatientsDashboardProps = {
+  patients: Patient[];
+  total: number;
+};
+
+function toDate(value: string | Date) {
+  return value instanceof Date ? value : new Date(value);
+}
+
+function formatDateTime(value: string | Date) {
+  const d = toDate(value);
+  // Formato parecido com o seu print: 04.03.2026, 23:35
+  return new Intl.DateTimeFormat("de-DE", {
     day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  });
+  }).format(d);
 }
 
-function isToday(iso: string) {
-  const d = new Date(iso);
-  const now = new Date();
+function isSameDay(a: Date, b: Date) {
   return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
   );
 }
 
-export default function PatientsDashboard({
-  patients,
-  total,
-}: {
-  patients: PatientDTO[];
-  total: number;
-}) {
-  const [q, setQ] = useState("");
+function splitName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return { firstName: "", lastName: "" };
+  if (parts.length === 1) return { firstName: parts[0], lastName: "" };
+  return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
+}
 
-  const filtered = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    if (!s) return patients;
+export default function PatientsDashboard({ patients, total }: PatientsDashboardProps) {
+  // Copia local para poder adicionar via modal (sem backend por enquanto)
+  const [items, setItems] = useState<Patient[]>(patients ?? []);
+  const [query, setQuery] = useState("");
 
-    return patients.filter((p) => {
-      const full = `${p.firstName} ${p.lastName}`.toLowerCase();
+  // Modal Create
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  // Se o server enviar novos pacientes, sincroniza
+  useEffect(() => {
+    setItems(patients ?? []);
+  }, [patients]);
+
+  const filteredPatients = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return items;
+
+    return items.filter((p) => {
+      const fullName = `${p.firstName ?? ""} ${p.lastName ?? ""}`.trim().toLowerCase();
       const email = (p.email ?? "").toLowerCase();
-      const phone = (p.phone ?? "").toLowerCase();
-      return full.includes(s) || email.includes(s) || phone.includes(s);
+      const phone = (p.phone ?? "").toString().toLowerCase();
+
+      return fullName.includes(q) || email.includes(q) || phone.includes(q);
     });
-  }, [patients, q]);
+  }, [items, query]);
 
-  const newToday = useMemo(
-    () => patients.filter((p) => isToday(p.createdAt)).length,
-    [patients]
-  );
+  // KPIs
+  const totalPatients = useMemo(() => items.length, [items.length]);
 
-  const last = patients[0]; // já vem orderBy desc
+  const newToday = useMemo(() => {
+    const today = new Date();
+    return items.filter((p) => isSameDay(toDate(p.createdAt), today)).length;
+  }, [items]);
+
+  const lastRegistered = useMemo(() => {
+    if (!items.length) return null;
+    return items
+      .slice()
+      .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime())[0];
+  }, [items]);
+
+  // Create handler (persist in backend)
+  const handleCreatePatient = async (values: {
+    name: string;
+    email: string;
+    phone?: string;
+    birthDate: string;
+    insurancePlan: string;
+  }) => {
+    const { firstName, lastName } = splitName(values.name);
+
+    const response = await fetch("/api/patients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        email: values.email,
+        phone: values.phone || null,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      throw new Error(errorBody?.error || "Falha ao criar paciente.");
+    }
+
+    const result = (await response.json()) as { created: Patient };
+    setItems((prev) => [result.created, ...prev]);
+
+    setIsCreateOpen(false);
+    setQuery("");
+  };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Patients Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Gestão rápida de pacientes (demo)
-        </p>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      {/* Title */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-gray-900">Patientenverwaltung</h1>
+        <p className="mt-1 text-sm text-gray-500">Patientenübersicht (Demo)</p>
       </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-3 gap-6">
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Total pacientes</p>
-          <p className="text-3xl font-semibold mt-1">{total}</p>
+      {/* KPI cards */}
+      <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Gesamtanzahl der Patienten</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">{totalPatients}</p>
         </div>
 
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Novos hoje</p>
-          <p className="text-3xl font-semibold mt-1">{newToday}</p>
+        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Heute neu registriert</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">{newToday}</p>
         </div>
 
-        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Último cadastro</p>
-          <p className="text-base font-semibold mt-1">
-            {last ? `${last.firstName} ${last.lastName}` : "—"}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            {last ? formatDate(last.createdAt) : ""}
-          </p>
+        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Letzte Registrierung</p>
+          {lastRegistered ? (
+            <>
+              <p className="mt-2 text-base font-semibold text-gray-900">
+                {lastRegistered.firstName} {lastRegistered.lastName}
+              </p>
+              <p className="mt-1 text-sm text-gray-500">{formatDateTime(lastRegistered.createdAt)}</p>
+            </>
+          ) : (
+            <p className="mt-2 text-sm text-gray-500">—</p>
+          )}
         </div>
       </div>
 
-      {/* Search */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative w-full max-w-xl">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-          </span>
+      {/* Search + Create button */}
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full sm:max-w-xl">
           <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar por nome, email ou telefone"
-            className="w-full rounded-xl border border-gray-200 bg-white px-10 py-2.5 text-sm shadow-sm outline-none focus:border-gray-300 focus:ring-2 focus:ring-emerald-100"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Nach Name, E-Mail oder Telefonnummer suchen"
+            className="w-full rounded-xl border px-10 py-2 outline-none focus:ring-2 focus:ring-green-200"
           />
+          <span className="pointer-events-none absolute left-3 top-2.5 text-gray-400">🔎</span>
         </div>
-        <span className="text-sm text-gray-500">{filtered.length} resultado(s)</span>
+
+        <button
+          onClick={() => setIsCreateOpen(true)}
+          className="rounded-xl bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700"
+        >
+          + Neuer Patient
+        </button>
       </div>
+
+      {/* Counter */}
+      <div className="mb-3 text-sm text-gray-500">{filteredPatients.length} Ergebnisse gefunden</div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
         <div className="max-h-[420px] overflow-auto">
-          <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-gray-50 border-b text-xs uppercase tracking-wide text-gray-500">
-              <tr>
-                <th className="px-5 py-3 text-left">Nome</th>
-                <th className="px-5 py-3 text-left">Email</th>
-                <th className="px-5 py-3 text-left">Telefone</th>
-                <th className="px-5 py-3 text-left">Criado em</th>
+          <table className="w-full table-auto">
+            <thead className="sticky top-0 bg-gray-50">
+              <tr className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <th className="px-5 py-3">Name</th>
+                <th className="px-5 py-3">E-Mail</th>
+                <th className="px-5 py-3">Telefon</th>
+                <th className="px-5 py-3">Erstellt am</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-gray-100">
-              {filtered.map((p, idx) => (
-                <tr
-                  key={p.id}
-                  className={idx % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100"}
-                >
-                  <td className="px-5 py-3 font-medium text-gray-900">
-                    {p.firstName} {p.lastName}
-                  </td>
-                  <td className="px-5 py-3 text-gray-600">{p.email ?? "—"}</td>
-                  <td className="px-5 py-3 text-gray-600">{p.phone ?? "—"}</td>
-                  <td className="px-5 py-3 text-gray-600">
-                    {formatDate(p.createdAt)}
-                  </td>
-                </tr>
-              ))}
-
-              {filtered.length === 0 && (
+            <tbody className="text-sm text-gray-700">
+              {filteredPatients.length === 0 ? (
                 <tr>
-                  <td className="p-6 text-gray-500" colSpan={4}>
-                    Nenhum paciente encontrado.
+                  <td className="px-5 py-6 text-gray-500" colSpan={4}>
+                    Keine Patienten gefunden.
                   </td>
                 </tr>
+              ) : (
+                filteredPatients.map((p, idx) => (
+                  <tr key={String(p.id)} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="px-5 py-3 font-medium text-gray-900">
+                      {p.firstName} {p.lastName}
+                    </td>
+                    <td className="px-5 py-3">{p.email}</td>
+                    <td className="px-5 py-3">{p.phone ? p.phone : "—"}</td>
+                    <td className="px-5 py-3">{formatDateTime(p.createdAt)}</td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
         </div>
 
-        <div className="border-t p-3 text-xs text-gray-500">
-          Dica: essa busca é client-side (rápida). Depois podemos evoluir pra
-          paginação + filtros server-side.
+        <div className="border-t px-5 py-3 text-xs text-gray-500">
+          Hinweis: Diese Suche ist clientseitig (schnell). Später können wir auf Paginierung + serverseitige Filter erweitern.
         </div>
       </div>
+
+      {/* Modal Create */}
+      <Modal
+        isOpen={isCreateOpen}
+        title="Neuer Patient"
+        onClose={() => setIsCreateOpen(false)}
+        size="md"
+      >
+        <PatientForm
+          initialValues={{
+            name: "",
+            email: "",
+            phone: "",
+            birthDate: "",
+            insurancePlan: "",
+          }}
+          onSubmit={handleCreatePatient}
+          onCancel={() => setIsCreateOpen(false)}
+          submitLabel="Speichern"
+        />
+      </Modal>
     </div>
   );
 }
