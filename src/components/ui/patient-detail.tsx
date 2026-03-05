@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type Patient = {
   id: string;
@@ -52,15 +53,36 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
     setError(null);
     setIsSaving(true);
     try {
+      const nextPayload = {
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim() || null,
+        phone: form.phone.trim() || null,
+      };
+
+      const current = {
+        firstName: patient.firstName,
+        lastName: patient.lastName,
+        email: patient.email ?? null,
+        phone: patient.phone ?? null,
+      };
+
+      const payload: Partial<typeof nextPayload> = {};
+      (Object.keys(nextPayload) as Array<keyof typeof nextPayload>).forEach((key) => {
+        if (nextPayload[key] !== current[key]) payload[key] = nextPayload[key];
+      });
+
+      if (Object.keys(payload).length === 0) {
+        setIsEditing(false);
+        toast.message("Keine Änderungen.");
+        setIsSaving(false);
+        return;
+      }
+
       const res = await fetch(`/api/patients/${patient.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName: form.firstName.trim(),
-          lastName: form.lastName.trim(),
-          email: form.email.trim() || null,
-          phone: form.phone.trim() || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -71,6 +93,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
       const updated = (await res.json()) as Patient;
       setPatient(updated);
       setIsEditing(false);
+      toast.success("Gespeichert");
       router.refresh();
     } catch (e: any) {
       setError(e?.message || "Unbekannter Fehler.");
@@ -89,6 +112,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error || "Löschen fehlgeschlagen.");
       }
+      toast.success("Patient gelöscht");
       router.push("/patients");
     } catch (e: any) {
       setError(e?.message || "Unbekannter Fehler.");
