@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import Modal from "@/components/Modal";
 import PatientForm from "@/components/PatientForm";
+import { toast } from "sonner";
 
 type Patient = {
   id: string | number;
@@ -96,12 +98,17 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
 
   // Create handler (persist in backend)
   const handleCreatePatient = async (values: {
-    name: string;
-    email: string;
-    phone?: string;
-    birthDate: string;
-    insurancePlan: string;
-  }) => {
+  name: string;
+  email: string;
+  phone?: string;
+  birthDate: string;
+  insurancePlan: string;
+}) => {
+
+  const toastId = toast.loading("Patient wird gespeichert...");
+
+  try {
+
     const { firstName, lastName } = splitName(values.name);
 
     const response = await fetch("/api/patients", {
@@ -117,15 +124,27 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => ({}));
-      throw new Error(errorBody?.error || "Falha ao criar paciente.");
+      throw new Error(errorBody?.error || "Fehler beim Erstellen des Patienten");
     }
 
     const result = (await response.json()) as { created: Patient };
+
     setItems((prev) => [result.created, ...prev]);
 
     setIsCreateOpen(false);
     setQuery("");
-  };
+
+    toast.success("Patient erfolgreich erstellt", { id: toastId });
+
+  } catch (error: any) {
+
+    toast.error("Fehler beim Speichern", {
+      id: toastId,
+      description: error.message,
+    });
+
+  }
+};
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -209,7 +228,12 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
                 filteredPatients.map((p, idx) => (
                   <tr key={String(p.id)} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                     <td className="px-5 py-3 font-medium text-gray-900">
-                      {p.firstName} {p.lastName}
+                      <Link
+                        href={`/patients/${p.id}`}
+                        className="hover:underline underline-offset-4"
+                      >
+                        {p.firstName} {p.lastName}
+                      </Link>
                     </td>
                     <td className="px-5 py-3">{p.email}</td>
                     <td className="px-5 py-3">{p.phone ? p.phone : "—"}</td>
