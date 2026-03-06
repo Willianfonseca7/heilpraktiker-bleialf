@@ -13,10 +13,14 @@ type Patient = {
 async function getPatient(id: string): Promise<Patient> {
   const h = await headers();
   const host = h.get("host");
+  const cookie = h.get("cookie") ?? "";
   const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
 
   const res = await fetch(`${protocol}://${host}/api/patients/${id}`, {
     cache: "no-store",
+    headers: {
+      cookie,
+    },
   });
 
   if (!res.ok) {
