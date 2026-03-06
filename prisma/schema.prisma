@@ -19,3 +19,19 @@ model Patient {
   phone     String?
   createdAt DateTime @default(now())
 }
+
+model User {
+  id        String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ADMIN)
+  isActive     Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+}

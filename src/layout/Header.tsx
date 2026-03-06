@@ -2,7 +2,7 @@
 
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { NavItem } from "../types/navigation";
 
 type Brand = {
@@ -19,7 +19,16 @@ type HeaderProps = {
 
 export function Header({ brand, navItems, contactItem }: HeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const isHome = pathname === "/";
+  const isAdminRoute =
+    pathname.startsWith("/patients") || pathname.startsWith("/verwaltung");
+  const homeHref = isAdminRoute ? "/patients" : "/";
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/verwaltung/login");
+  };
 
   return (
     <Box
@@ -51,7 +60,7 @@ export function Header({ brand, navItems, contactItem }: HeaderProps) {
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Box
             component={Link}
-            href="/"
+            href={homeHref}
             sx={{
               width: 42,
               height: 42,
@@ -70,7 +79,7 @@ export function Header({ brand, navItems, contactItem }: HeaderProps) {
           <Box>
             <Typography
               component={Link}
-              href="/"
+              href={homeHref}
               variant="h6"
               sx={{
                 textDecoration: "none",
@@ -88,40 +97,64 @@ export function Header({ brand, navItems, contactItem }: HeaderProps) {
         </Stack>
 
         <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", alignItems: "center" }}>
-          {navItems.map((item) => (
+          {isAdminRoute ? (
             <Button
-              key={item.path}
-              component={Link}
-              href={item.path}
+              onClick={handleLogout}
+              variant="outlined"
               color="inherit"
               sx={{
-                fontWeight: 600,
+                borderRadius: 999,
+                px: 2.5,
+                fontWeight: 700,
                 color: "common.white",
+                borderColor: "rgba(255,255,255,0.7)",
+                bgcolor: "transparent",
+                "&:hover": {
+                  borderColor: "rgba(255,255,255,0.95)",
+                  bgcolor: "rgba(255,255,255,0.12)",
+                },
               }}
             >
-              {item.label}
+              Abmelden
             </Button>
-          ))}
-          <Button
-            component={Link}
-            href={contactItem.path}
-            variant="outlined"
-            color="inherit"
-            sx={{
-              borderRadius: 999,
-              px: 2.5,
-              fontWeight: 700,
-              color: "common.white",
-              borderColor: "rgba(255,255,255,0.7)",
-              bgcolor: "transparent",
-              "&:hover": {
-                borderColor: "rgba(255,255,255,0.95)",
-                bgcolor: "rgba(255,255,255,0.12)",
-              },
-            }}
-          >
-            {contactItem.label}
-          </Button>
+          ) : (
+            <>
+              {navItems.map((item) => (
+                <Button
+                  key={item.path}
+                  component={Link}
+                  href={item.path}
+                  color="inherit"
+                  sx={{
+                    fontWeight: 600,
+                    color: "common.white",
+                  }}
+                >
+                  {item.label}
+                </Button>
+              ))}
+              <Button
+                component={Link}
+                href={contactItem.path}
+                variant="outlined"
+                color="inherit"
+                sx={{
+                  borderRadius: 999,
+                  px: 2.5,
+                  fontWeight: 700,
+                  color: "common.white",
+                  borderColor: "rgba(255,255,255,0.7)",
+                  bgcolor: "transparent",
+                  "&:hover": {
+                    borderColor: "rgba(255,255,255,0.95)",
+                    bgcolor: "rgba(255,255,255,0.12)",
+                  },
+                }}
+              >
+                {contactItem.label}
+              </Button>
+            </>
+          )}
         </Stack>
       </Container>
     </Box>

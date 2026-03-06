@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Modal from "@/components/Modal";
 import PatientForm from "@/components/PatientForm";
 import { toast } from "sonner";
@@ -59,6 +60,7 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
   // Copia local para poder adicionar via modal (sem backend por enquanto)
   const [items, setItems] = useState<Patient[]>(patients ?? []);
   const [query, setQuery] = useState("");
+  const router = useRouter();
 
   // Modal Create
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -226,11 +228,16 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
                 </tr>
               ) : (
                 filteredPatients.map((p, idx) => (
-                  <tr key={String(p.id)} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <tr
+                    key={String(p.id)}
+                    onClick={() => router.push(`/patients/${p.id}`)}
+                    className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} cursor-pointer hover:bg-black/5`}
+                  >
                     <td className="px-5 py-3 font-medium text-gray-900">
                       <Link
                         href={`/patients/${p.id}`}
                         className="hover:underline underline-offset-4"
+                        onClick={(event) => event.stopPropagation()}
                       >
                         {p.firstName} {p.lastName}
                       </Link>
