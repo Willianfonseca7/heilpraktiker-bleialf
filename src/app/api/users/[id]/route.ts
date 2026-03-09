@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/session";
+import { getSessionMaxAgeSeconds, signSession } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
@@ -117,7 +118,46 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
     },
   });
 
-  return NextResponse.json(updated);
+  const response = NextResponse.json(updated);
+
+  if (session.sub === updated.id) {
+    if (!updated.isActive) {
+      response.cookies.set("admin-session", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
+      return response;
+    }
+
+    const token = await signSession({
+      sub: updated.id,
+      email: updated.email,
+      role: updated.role,
+      firstName: updated.firstName,
+      lastName: updated.lastName,
+    });
+
+    const maxAge = getSessionMaxAgeSeconds();
+    const sessionExpiresAt = new Date(Date.now() + maxAge * 1000);
+
+    await prisma.user.update({
+      where: { id: updated.id },
+      data: { sessionExpiresAt },
+    });
+
+    response.cookies.set("admin-session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge,
+    });
+  }
+
+  return response;
 }
 
 export async function DELETE(_: Request, { params }: { params: Params }) {
