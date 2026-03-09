@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifySession } from "@/lib/auth";
 
 function isAdminHost(host: string) {
   if (host.startsWith("admin.")) return true;
@@ -8,18 +9,38 @@ function isAdminHost(host: string) {
   return false;
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
   const { pathname } = req.nextUrl;
-  const hasSession = Boolean(req.cookies.get("admin-session")?.value);
+  const token = req.cookies.get("admin-session")?.value;
+  let hasSession = false;
+  if (token) {
+    try {
+      await verifySession(token);
+      hasSession = true;
+    } catch {
+      hasSession = false;
+    }
+  }
 
   const isAdminRoute =
     pathname.startsWith("/patients") ||
-    pathname.startsWith("/verwaltung") ||
+    pathname.startsWith("/admin") ||
     pathname.startsWith("/login");
 
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/verwaltung")) {
+    const url = req.nextUrl.clone();
+    url.pathname = pathname
+      .replace(/^\/verwaltung\/admins/, "/admin/users")
+      .replace(/^\/verwaltung\/login/, "/admin/login");
+    if (url.pathname.startsWith("/verwaltung")) {
+      url.pathname = url.pathname.replace(/^\/verwaltung/, "/admin");
+    }
+    return NextResponse.redirect(url);
   }
 
   if (isAdminRoute && !isAdminHost(host)) {
@@ -28,7 +49,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (pathname.startsWith("/verwaltung/login")) {
+  if (pathname.startsWith("/admin/login")) {
     if (hasSession) {
       const url = req.nextUrl.clone();
       url.pathname = "/patients";
@@ -37,10 +58,26 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname.startsWith("/admin/session-expired")) {
+    if (hasSession) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/patients";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/api/patients") && !hasSession) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (pathname.startsWith("/api/users") && !hasSession) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   if (isAdminRoute && !hasSession) {
     const url = req.nextUrl.clone();
-    url.pathname = "/verwaltung/login";
-    url.searchParams.set("reason", "expired");
+    url.pathname = "/admin/session-expired";
     return NextResponse.redirect(url);
   }
 

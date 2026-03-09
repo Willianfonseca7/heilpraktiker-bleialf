@@ -22,12 +22,12 @@ export function Header({ brand, navItems, contactItem }: HeaderProps) {
   const router = useRouter();
   const isHome = pathname === "/";
   const isAdminRoute =
-    pathname.startsWith("/patients") || pathname.startsWith("/verwaltung");
+    pathname.startsWith("/patients") || pathname.startsWith("/admin");
   const homeHref = isAdminRoute ? "/patients" : "/";
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/verwaltung/login");
+    router.push("/admin/login");
   };
 
   return (
