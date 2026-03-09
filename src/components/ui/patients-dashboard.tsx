@@ -112,6 +112,9 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
   try {
 
     const { firstName, lastName } = splitName(values.name);
+    if (!firstName || !lastName) {
+      throw new Error("Bitte Vor- und Nachname eingeben.");
+    }
 
     const response = await fetch("/api/patients", {
       method: "POST",

@@ -68,9 +68,19 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
       };
 
       const payload: Partial<typeof nextPayload> = {};
-      (Object.keys(nextPayload) as Array<keyof typeof nextPayload>).forEach((key) => {
-        if (nextPayload[key] !== current[key]) payload[key] = nextPayload[key];
-      });
+
+      if (nextPayload.firstName !== current.firstName) {
+        payload.firstName = nextPayload.firstName;
+      }
+      if (nextPayload.lastName !== current.lastName) {
+        payload.lastName = nextPayload.lastName;
+      }
+      if (nextPayload.email !== current.email) {
+        payload.email = nextPayload.email;
+      }
+      if (nextPayload.phone !== current.phone) {
+        payload.phone = nextPayload.phone;
+      }
 
       if (Object.keys(payload).length === 0) {
         setIsEditing(false);

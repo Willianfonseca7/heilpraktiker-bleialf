@@ -19,7 +19,13 @@ export default function AdminLogin() {
     });
 
     if (res.ok) {
-      router.push("/patients");
+      const data = await res.json().catch(() => null);
+      const role = data?.role;
+      if (role === "SUPERADMIN") {
+        router.push("/admin/users");
+      } else {
+        router.push("/patients");
+      }
     } else {
       const data = await res.json().catch(() => null);
       alert(data?.error ?? "Anmeldung fehlgeschlagen");

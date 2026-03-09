@@ -22,9 +22,12 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
+      firstName: true,
+      lastName: true,
       email: true,
       role: true,
       isActive: true,
+      sessionExpiresAt: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -45,6 +48,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   }
 
+  const firstName =
+    typeof body.firstName === "string" ? body.firstName.trim() : "";
+  const lastName =
+    typeof body.lastName === "string" ? body.lastName.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim() : "";
   const password = typeof body.password === "string" ? body.password : "";
   const role =
@@ -55,9 +62,9 @@ export async function POST(req: Request) {
       : Role.ADMIN;
   const isActive = typeof body.isActive === "boolean" ? body.isActive : true;
 
-  if (!email || !password) {
+  if (!firstName || !lastName || !email || !password) {
     return NextResponse.json(
-      { error: "Email and password are required" },
+      { error: "Vorname, Nachname, E-Mail und Passwort sind erforderlich" },
       { status: 400 }
     );
   }
@@ -65,6 +72,8 @@ export async function POST(req: Request) {
   const passwordHash = await bcrypt.hash(password, 10);
   const created = await prisma.user.create({
     data: {
+      firstName,
+      lastName,
       email,
       passwordHash,
       role,
@@ -72,9 +81,12 @@ export async function POST(req: Request) {
     },
     select: {
       id: true,
+      firstName: true,
+      lastName: true,
       email: true,
       role: true,
       isActive: true,
+      sessionExpiresAt: true,
       createdAt: true,
       updatedAt: true,
     },

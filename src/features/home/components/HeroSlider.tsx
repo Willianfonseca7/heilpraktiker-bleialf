@@ -13,17 +13,18 @@ type HeroSliderProps = {
 export function HeroSlider({ slides, intervalMs = 6000 }: HeroSliderProps) {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
-
-  if (slides.length === 0) {
-    return null;
-  }
+  const hasSlides = slides.length > 0;
 
   useInterval(
     () => {
       setActive((prev) => (prev + 1) % slides.length);
     },
-    paused ? null : intervalMs
+    !hasSlides || paused ? null : intervalMs
   );
+
+  if (!hasSlides) {
+    return null;
+  }
 
   return (
     <Box

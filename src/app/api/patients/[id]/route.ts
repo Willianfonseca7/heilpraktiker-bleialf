@@ -2,6 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/db";
+import { requireSession } from "@/lib/session";
 import { NextResponse } from "next/server";
 
 type Params = { id: string };
@@ -12,6 +13,9 @@ function isValidId(id: string) {
 
 export async function GET(_: Request, { params }: { params: Params }) {
   try {
+    const session = await requireSession();
+    if (session instanceof NextResponse) return session;
+
     const id = params?.id;
     if (!isValidId(id)) {
       return NextResponse.json({ error: "id is required" }, { status: 400 });
@@ -30,6 +34,9 @@ export async function GET(_: Request, { params }: { params: Params }) {
 
 export async function PATCH(req: Request, { params }: { params: Params }) {
   try {
+    const session = await requireSession();
+    if (session instanceof NextResponse) return session;
+
     const id = params?.id;
     if (!isValidId(id)) {
       return NextResponse.json({ error: "id is required" }, { status: 400 });
@@ -66,6 +73,9 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
 
 export async function DELETE(_: Request, { params }: { params: Params }) {
   try {
+    const session = await requireSession();
+    if (session instanceof NextResponse) return session;
+
     const id = params?.id;
     if (!isValidId(id)) {
       return NextResponse.json({ error: "id is required" }, { status: 400 });

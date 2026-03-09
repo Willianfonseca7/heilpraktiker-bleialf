@@ -19,7 +19,11 @@ const INSURANCE_OPTIONS = [
 function validate(values: PatientFormValues) {
   const errors: Partial<Record<keyof PatientFormValues, string>> = {};
 
-  if (!values.name.trim()) errors.name = "Name ist erforderlich.";
+  if (!values.name.trim()) {
+    errors.name = "Name ist erforderlich.";
+  } else if (values.name.trim().split(/\s+/).length < 2) {
+    errors.name = "Bitte Vor- und Nachname eingeben.";
+  }
   if (!values.email.trim()) errors.email = "E-Mail ist erforderlich.";
   else if (!/^\S+@\S+\.\S+$/.test(values.email))
     errors.email = "Ungültige E-Mail.";

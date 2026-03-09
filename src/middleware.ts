@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifySession } from "@/lib/auth";
 
+type AdminRole = "SUPERADMIN" | "ADMIN" | "PATIENT" | null;
+
 function isAdminHost(host: string) {
   if (host.startsWith("admin.")) return true;
   if (host.startsWith("localhost")) return true;
@@ -14,10 +16,12 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("admin-session")?.value;
   let hasSession = false;
+  let role: AdminRole = null;
   if (token) {
     try {
-      await verifySession(token);
+      const session = await verifySession(token);
       hasSession = true;
+      role = (session?.role as AdminRole) ?? null;
     } catch {
       hasSession = false;
     }
@@ -52,16 +56,7 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith("/admin/login")) {
     if (hasSession) {
       const url = req.nextUrl.clone();
-      url.pathname = "/patients";
-      return NextResponse.redirect(url);
-    }
-    return NextResponse.next();
-  }
-
-  if (pathname.startsWith("/admin/session-expired")) {
-    if (hasSession) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/patients";
+      url.pathname = role === "SUPERADMIN" ? "/admin/users" : "/patients";
       return NextResponse.redirect(url);
     }
     return NextResponse.next();
@@ -71,13 +66,19 @@ export async function middleware(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (pathname.startsWith("/admin/users") && role !== "SUPERADMIN") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/patients";
+    return NextResponse.redirect(url);
+  }
+
   if (pathname.startsWith("/api/users") && !hasSession) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   if (isAdminRoute && !hasSession) {
     const url = req.nextUrl.clone();
-    url.pathname = "/admin/session-expired";
+    url.pathname = "/admin/login";
     return NextResponse.redirect(url);
   }
 

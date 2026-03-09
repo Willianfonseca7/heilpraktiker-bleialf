@@ -1,0 +1,2 @@
+ALTER TABLE "User"
+ADD COLUMN "sessionExpiresAt" TIMESTAMP(3);
