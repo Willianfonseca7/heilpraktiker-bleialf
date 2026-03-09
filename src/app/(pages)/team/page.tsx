@@ -7,7 +7,7 @@ export default function TeamPage() {
   return (
     <>
       <TeamHero
-        title="Unser Team"
+        title="Heilpraktiker-Zentrum Team"
         subtitle="Lernen Sie die Therapeuten des Heilpraktiker-Zentrums Bleialf kennen."
       />
 
