@@ -12,6 +12,15 @@ export type User = {
   updatedAt?: string;
 };
 
+export type CurrentUser = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+};
+
 export type CreateAdminPayload = {
   firstName: string;
   lastName: string;
@@ -28,4 +37,11 @@ export type UpdateUserPayload = {
   password?: string;
   role?: UserRole;
   isActive?: boolean;
+};
+
+export type UpdateOwnProfilePayload = {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
 };
