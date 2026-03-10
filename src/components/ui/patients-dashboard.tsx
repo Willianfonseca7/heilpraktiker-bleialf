@@ -193,14 +193,14 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Nach Name, E-Mail oder Telefonnummer suchen"
-            className="w-full rounded-xl border px-10 py-2 outline-none focus:ring-2 focus:ring-green-200"
+            className="w-full rounded-xl border px-10 py-2 outline-none focus:ring-2 focus:ring-emerald-200"
           />
           <span className="pointer-events-none absolute left-3 top-2.5 text-gray-400">🔎</span>
         </div>
 
         <button
           onClick={() => setIsCreateOpen(true)}
-          className="rounded-xl bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700"
+          className="rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700"
         >
           + Neuer Patient
         </button>

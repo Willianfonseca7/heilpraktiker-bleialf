@@ -3,11 +3,15 @@
 @tailwind utilities;
 
 :root {
+  --brand-primary: #059669;
+  --brand-primary-dark: #047857;
+  --brand-heading: #065f46;
+  --brand-soft: rgba(5, 150, 105, 0.08);
   font-family: "Inter", "Segoe UI", "Roboto", "Arial", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #1f2a1f;
-  background-color: #fbfbf7;
+  color: #16352a;
+  background-color: #f6fbf7;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,7 +28,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #fbfbf7;
+  background-color: #f6fbf7;
   color: inherit;
 }
 

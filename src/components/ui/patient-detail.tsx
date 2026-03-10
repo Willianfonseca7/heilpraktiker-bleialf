@@ -155,7 +155,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-60"
+              className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
             >
               {isSaving ? "Speichern..." : "Speichern"}
             </button>
@@ -187,7 +187,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
             <input
               value={form.email}
               onChange={onChange("email")}
-              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-green-200"
+              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
               placeholder="name@domain.de"
             />
           )}
@@ -203,7 +203,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
             <input
               value={form.phone}
               onChange={onChange("phone")}
-              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-green-200"
+              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
               placeholder="+49 176 12345678"
             />
           )}
@@ -221,7 +221,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
             <input
               value={form.firstName}
               onChange={onChange("firstName")}
-              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-green-200"
+              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
             />
           )}
         </div>
@@ -236,7 +236,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
             <input
               value={form.lastName}
               onChange={onChange("lastName")}
-              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-green-200"
+              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
             />
           )}
         </div>

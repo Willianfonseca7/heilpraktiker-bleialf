@@ -48,6 +48,7 @@ export function Header({
   const [user, setUser] = useState<AdminNavbarUser | null>(initialUser);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountSubmitting, setAccountSubmitting] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const role = user?.role ?? null;
 
   useEffect(() => {
@@ -81,6 +82,16 @@ export function Header({
       active = false;
     };
   }, [isAdminRoute, pathname]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const accountUser: CurrentUser | null = user?.id
     ? {
@@ -181,22 +192,25 @@ export function Header({
       <Box
         component="header"
         sx={{
-          position: isHome ? "absolute" : "sticky",
+          position: "sticky",
           top: 0,
           left: 0,
           right: 0,
           zIndex: 10,
-          color: "common.white",
-          bgcolor: "primary.main",
-          background:
-            "linear-gradient(180deg, rgba(86,136,37,0.95) 0%, rgba(86,136,37,0.85) 55%, rgba(86,136,37,0.7) 100%)",
-          backdropFilter: "blur(6px)",
-          borderBottom: "1px solid rgba(255,255,255,0.18)",
+          color: "#24513a",
+          bgcolor: scrolled ? "rgba(240, 249, 244, 0.95)" : "#ecf8f0",
+          borderBottom: scrolled
+            ? "1px solid rgba(16, 185, 129, 0.14)"
+            : "1px solid transparent",
+          backdropFilter: scrolled ? "blur(10px)" : "none",
+          boxShadow: scrolled ? "0 8px 24px rgba(15, 23, 42, 0.06)" : "none",
+          transition:
+            "background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, backdrop-filter 180ms ease",
         }}
       >
         <Container
           sx={{
-            py: 1.5,
+            py: 1.6,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -209,16 +223,18 @@ export function Header({
               component={Link}
               href={homeHref}
               sx={{
-                width: 42,
-                height: 42,
+                width: 44,
+                height: 44,
                 borderRadius: "50%",
-                bgcolor: "rgba(255,255,255,0.92)",
-                color: "primary.main",
+                bgcolor: "#ffffff",
+                color: "#047857",
                 display: "grid",
                 placeItems: "center",
                 fontWeight: 800,
+                fontSize: "0.95rem",
                 textDecoration: "none",
-                boxShadow: "0 8px 18px rgba(0,0,0,0.25)",
+                border: "1px solid rgba(16, 185, 129, 0.18)",
+                boxShadow: "0 6px 16px rgba(15, 23, 42, 0.06)",
               }}
             >
               {brand.shortName}
@@ -230,20 +246,22 @@ export function Header({
                 variant="h6"
                 sx={{
                   textDecoration: "none",
-                  color: "common.white",
-                  fontWeight: 800,
+                  color: "#065f46",
+                  fontWeight: 700,
                   letterSpacing: 0.2,
+                  fontSize: "1.1rem",
+                  lineHeight: 1.2,
                 }}
               >
                 {brand.name}
               </Typography>
-              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.85)" }}>
+              <Typography variant="caption" sx={{ color: "rgba(6,95,70,0.72)" }}>
                 {brand.tagline}
               </Typography>
             </Box>
           </Stack>
 
-          <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", alignItems: "center" }}>
+          <Stack direction="row" spacing={1.25} sx={{ flexWrap: "wrap", alignItems: "center" }}>
             {isAdminRoute ? (
               <>
                 {adminNavItems.map((item) => (
@@ -254,7 +272,16 @@ export function Header({
                     color="inherit"
                     sx={{
                       fontWeight: 600,
-                      color: "common.white",
+                      color: "#065f46",
+                      borderRadius: 999,
+                      px: 1.2,
+                      py: 0.8,
+                      minHeight: 0,
+                      textTransform: "none",
+                      "&:hover": {
+                        bgcolor: "rgba(16, 185, 129, 0.08)",
+                        color: "#059669",
+                      },
                     }}
                   >
                     {item.label}
@@ -267,16 +294,21 @@ export function Header({
                       color="inherit"
                       sx={{
                         minWidth: 38,
-                        width: 38,
-                        height: 38,
+                        width: 40,
+                        height: 40,
                         borderRadius: "50%",
-                        bgcolor: "rgba(255,255,255,0.16)",
-                        border: "1px solid rgba(255,255,255,0.28)",
+                        bgcolor: "#ffffff",
+                        border: "1px solid rgba(16, 185, 129, 0.18)",
                         display: "grid",
                         placeItems: "center",
                         fontWeight: 800,
                         letterSpacing: 0.4,
                         p: 0,
+                        color: "#047857",
+                        boxShadow: "0 4px 14px rgba(15, 23, 42, 0.05)",
+                        "&:hover": {
+                          bgcolor: "#f7fffb",
+                        },
                       }}
                     >
                       {userInitials || "AD"}
@@ -289,12 +321,13 @@ export function Header({
                         borderRadius: 999,
                         px: 2.5,
                         fontWeight: 700,
-                        color: "common.white",
-                        borderColor: "rgba(255,255,255,0.7)",
-                        bgcolor: "transparent",
+                        textTransform: "none",
+                        color: "#065f46",
+                        borderColor: "rgba(16, 185, 129, 0.22)",
+                        bgcolor: "rgba(255,255,255,0.78)",
                         "&:hover": {
-                          borderColor: "rgba(255,255,255,0.95)",
-                          bgcolor: "rgba(255,255,255,0.12)",
+                          borderColor: "rgba(16, 185, 129, 0.34)",
+                          bgcolor: "rgba(16, 185, 129, 0.08)",
                         },
                       }}
                     >
@@ -313,7 +346,16 @@ export function Header({
                     color="inherit"
                     sx={{
                       fontWeight: 600,
-                      color: "common.white",
+                      color: "#065f46",
+                      borderRadius: 999,
+                      px: 1.2,
+                      py: 0.8,
+                      minHeight: 0,
+                      textTransform: "none",
+                      "&:hover": {
+                        bgcolor: "rgba(16, 185, 129, 0.08)",
+                        color: "#059669",
+                      },
                     }}
                   >
                     {item.label}
@@ -328,12 +370,14 @@ export function Header({
                     borderRadius: 999,
                     px: 2.5,
                     fontWeight: 700,
-                    color: "common.white",
-                    borderColor: "rgba(255,255,255,0.7)",
-                    bgcolor: "transparent",
+                    textTransform: "none",
+                    color: "#ffffff",
+                    borderColor: "#059669",
+                    bgcolor: "#059669",
+                    boxShadow: "0 10px 18px rgba(5, 150, 105, 0.18)",
                     "&:hover": {
-                      borderColor: "rgba(255,255,255,0.95)",
-                      bgcolor: "rgba(255,255,255,0.12)",
+                      borderColor: "#047857",
+                      bgcolor: "#047857",
                     },
                   }}
                 >

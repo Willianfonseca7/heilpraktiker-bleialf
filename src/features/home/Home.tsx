@@ -23,7 +23,7 @@ const objectiveWrapperSx = {
 const objectiveCardSx = {
   bgcolor: "primary.main",
   background:
-    "linear-gradient(135deg, rgba(86,136,37,1) 0%, rgba(86,136,37,0.92) 50%, rgba(86,136,37,0.84) 100%)",
+    "linear-gradient(135deg, rgba(5,150,105,1) 0%, rgba(5,150,105,0.92) 50%, rgba(5,150,105,0.84) 100%)",
   color: "common.white",
   p: { xs: 3, md: 6 },
   maxWidth: 900,
@@ -76,7 +76,7 @@ export function Home() {
           <HeroSlider slides={homeHeroSlides} />
         </Box>
 
-        <Box sx={objectiveWrapperSx}>
+        <Box id="health-check" sx={objectiveWrapperSx}>
           <Box sx={objectiveCardSx}>
             <Box aria-hidden sx={objectiveDecorationTopSx} />
             <Box aria-hidden sx={objectiveDecorationBottomSx} />
@@ -158,7 +158,7 @@ export function Home() {
               p: { xs: 2, md: 2.5 },
               borderLeft: "6px solid",
               borderColor: "primary.main",
-              bgcolor: "rgba(86,136,37,0.06)",
+              bgcolor: "rgba(5,150,105,0.08)",
             }}
           >
             <Typography

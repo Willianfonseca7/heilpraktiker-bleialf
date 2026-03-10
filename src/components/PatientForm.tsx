@@ -96,7 +96,7 @@ export default function PatientForm({
           value={values.name}
           onChange={setField("name")}
           className={`w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 ${
-            errors.name ? "border-red-300 focus:ring-red-200" : "focus:ring-green-200"
+            errors.name ? "border-red-300 focus:ring-red-200" : "focus:ring-emerald-200"
           }`}
           placeholder="z. B. Pedro Silva"
         />
@@ -114,7 +114,7 @@ export default function PatientForm({
           value={values.email}
           onChange={setField("email")}
           className={`w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 ${
-            errors.email ? "border-red-300 focus:ring-red-200" : "focus:ring-green-200"
+            errors.email ? "border-red-300 focus:ring-red-200" : "focus:ring-emerald-200"
           }`}
           placeholder="z. B. patient@email.com"
         />
@@ -132,7 +132,7 @@ export default function PatientForm({
           value={values.phone}
           onChange={setField("phone")}
           className={`w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 ${
-            errors.phone ? "border-red-300 focus:ring-red-200" : "focus:ring-green-200"
+            errors.phone ? "border-red-300 focus:ring-red-200" : "focus:ring-emerald-200"
           }`}
           placeholder="z. B. +49 176 12345678"
         />
@@ -155,7 +155,7 @@ export default function PatientForm({
             className={`w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 ${
               errors.birthDate
                 ? "border-red-300 focus:ring-red-200"
-                : "focus:ring-green-200"
+                : "focus:ring-emerald-200"
             }`}
           />
           {errors.birthDate ? (
@@ -174,7 +174,7 @@ export default function PatientForm({
             className={`w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 ${
               errors.insurancePlan
                 ? "border-red-300 focus:ring-red-200"
-                : "focus:ring-green-200"
+                : "focus:ring-emerald-200"
             }`}
           >
             {INSURANCE_OPTIONS.map((opt) => (
@@ -201,7 +201,7 @@ export default function PatientForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-xl bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 disabled:opacity-60"
+          className="rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
         >
           {isSubmitting ? "Speichern..." : submitLabel}
         </button>

@@ -53,7 +53,7 @@ export default function AdminLogin() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button type="submit" className="bg-green-600 text-white p-2 w-full">
+        <button type="submit" className="bg-emerald-600 text-white p-2 w-full hover:bg-emerald-700">
           Anmelden
         </button>
       </form>
