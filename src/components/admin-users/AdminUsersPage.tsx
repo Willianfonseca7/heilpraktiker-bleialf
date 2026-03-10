@@ -92,7 +92,7 @@ export default function AdminUsersPage() {
     lastName: string;
     email: string;
     password: string;
-    role: "SUPERADMIN" | "ADMIN" | "PATIENT";
+    role: "SUPERADMIN" | "ADMIN" | "USER";
     isActive: boolean;
   }) => {
     setSubmitting(true);

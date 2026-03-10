@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifySession } from "@/lib/auth";
+import { SESSION_COOKIE_NAME, verifySession } from "@/lib/auth";
 
-type AdminRole = "SUPERADMIN" | "ADMIN" | "PATIENT" | null;
+type AdminRole = "SUPERADMIN" | "ADMIN" | null;
 
 function isAdminHost(host: string) {
   if (host.startsWith("admin.")) return true;
@@ -14,18 +14,21 @@ function isAdminHost(host: string) {
 export async function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
   const { pathname } = req.nextUrl;
-  const token = req.cookies.get("admin-session")?.value;
-  let hasSession = false;
+  const token = req.cookies.get(SESSION_COOKIE_NAME)?.value;
   let role: AdminRole = null;
+
   if (token) {
     try {
       const session = await verifySession(token);
-      hasSession = true;
-      role = (session?.role as AdminRole) ?? null;
+      if (session?.role === "ADMIN" || session?.role === "SUPERADMIN") {
+        role = session.role;
+      }
     } catch {
-      hasSession = false;
+      role = null;
     }
   }
+
+  const hasAdminSession = role === "ADMIN" || role === "SUPERADMIN";
 
   const isAdminRoute =
     pathname.startsWith("/patients") ||
@@ -54,7 +57,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (pathname.startsWith("/admin/login")) {
-    if (hasSession) {
+    if (hasAdminSession) {
       const url = req.nextUrl.clone();
       url.pathname = role === "SUPERADMIN" ? "/admin/users" : "/patients";
       return NextResponse.redirect(url);
@@ -62,7 +65,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (pathname.startsWith("/api/patients") && !hasSession) {
+  if (pathname.startsWith("/api/patients") && !hasAdminSession) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -72,11 +75,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (pathname.startsWith("/api/users") && !hasSession) {
+  if (pathname.startsWith("/api/users") && !hasAdminSession) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (isAdminRoute && !hasSession) {
+  if (isAdminRoute && !hasAdminSession) {
     const url = req.nextUrl.clone();
     url.pathname = "/admin/login";
     return NextResponse.redirect(url);

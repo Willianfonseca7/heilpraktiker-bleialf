@@ -3,15 +3,22 @@ export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/session";
-import { getSessionMaxAgeSeconds, signSession } from "@/lib/auth";
+import {
+  getExpiredSessionCookieOptions,
+  getSessionCookieOptions,
+  getSessionMaxAgeSeconds,
+  SESSION_COOKIE_NAME,
+  signSession,
+} from "@/lib/auth";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
+import type { AppRole } from "@/lib/auth";
 
 type Params = { id: string };
 
-function isSuperadmin(role: Role) {
-  return role === Role.SUPERADMIN;
+function isSuperadmin(role: AppRole | Role) {
+  return role === "SUPERADMIN";
 }
 
 function isValidId(id: string) {
@@ -122,13 +129,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
 
   if (session.sub === updated.id) {
     if (!updated.isActive) {
-      response.cookies.set("admin-session", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-        maxAge: 0,
-      });
+      response.cookies.set(SESSION_COOKIE_NAME, "", getExpiredSessionCookieOptions());
       return response;
     }
 
@@ -148,13 +149,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
       data: { sessionExpiresAt },
     });
 
-    response.cookies.set("admin-session", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge,
-    });
+    response.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieOptions(maxAge));
   }
 
   return response;

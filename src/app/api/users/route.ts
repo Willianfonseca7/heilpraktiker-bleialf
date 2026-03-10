@@ -6,9 +6,10 @@ import { requireSession } from "@/lib/session";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
+import type { AppRole } from "@/lib/auth";
 
-function isSuperadmin(role: Role) {
-  return role === Role.SUPERADMIN;
+function isSuperadmin(role: AppRole | Role) {
+  return role === "SUPERADMIN";
 }
 
 export async function GET() {

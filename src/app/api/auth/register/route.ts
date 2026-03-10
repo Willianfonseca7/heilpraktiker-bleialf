@@ -1,5 +1,5 @@
-// src/app/api/auth/login/route.ts
 import { NextResponse } from "next/server";
+import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import {
@@ -14,41 +14,54 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json().catch(() => null);
 
-    if (!email || !password) {
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    }
+
+    const firstName = String(body.firstName || "").trim();
+    const lastName = String(body.lastName || "").trim();
+    const email = String(body.email || "").trim().toLowerCase();
+    const password = String(body.password || "").trim();
+
+    if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { error: "Missing credentials" },
+        { error: "Bitte alle Pflichtfelder ausfüllen." },
         { status: 400 }
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: String(email).trim().toLowerCase() },
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: "Passwort muss mindestens 6 Zeichen lang sein." },
+        { status: 400 }
+      );
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
     });
 
-    if (!user) {
+    if (existingUser) {
       return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
+        { error: "E-Mail ist bereits registriert." },
+        { status: 409 }
       );
     }
 
-    const valid = await bcrypt.compare(password, user.passwordHash);
+    const passwordHash = await bcrypt.hash(password, 10);
 
-    if (!valid) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
-      );
-    }
-
-    if (!user.isActive) {
-      return NextResponse.json(
-        { error: "User inactive" },
-        { status: 403 }
-      );
-    }
+    const user = await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        passwordHash,
+        role: "USER" as unknown as Role,
+        isActive: true,
+      },
+    });
 
     const token = await signSession({
       sub: user.id,
@@ -82,7 +95,7 @@ export async function POST(req: Request) {
     return response;
   } catch {
     return NextResponse.json(
-      { error: "Login failed" },
+      { error: "Registrierung fehlgeschlagen." },
       { status: 500 }
     );
   }

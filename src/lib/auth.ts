@@ -1,7 +1,10 @@
+// src/lib/auth.ts
+export type AppRole = "USER" | "ADMIN" | "SUPERADMIN";
+
 export type SessionPayload = {
   sub: string;
   email: string;
-  role: "SUPERADMIN" | "ADMIN";
+  role: AppRole;
   firstName: string;
   lastName: string;
 };
@@ -14,30 +17,34 @@ type JwtPayload = SessionPayload & {
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
+export const SESSION_COOKIE_NAME = "app-session";
+export const SESSION_COOKIE_PATH = "/";
+
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error("JWT_SECRET is missing");
-  }
+  if (!secret) throw new Error("JWT_SECRET is missing");
   return secret;
 }
 
-function base64urlEncode(input: Uint8Array | string) {
-  const data = typeof input === "string" ? input : decoder.decode(input);
+function base64UrlEncode(input: Uint8Array | string) {
+  const data =
+    typeof input === "string" ? input : decoder.decode(input);
   const b64 =
     typeof Buffer !== "undefined"
-      ? Buffer.from(data, "utf8").toString("base64")
+      ? Buffer.from(data, "utf-8").toString("base64")
       : btoa(data);
+
   return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
-function base64urlDecode(input: string) {
+function base64UrlDecode(input: string) {
   const b64 = input.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = b64.length % 4 === 0 ? "" : "=".repeat(4 - (b64.length % 4));
+  const pad = "=".repeat((4 - (b64.length % 4)) % 4);
   const str =
     typeof Buffer !== "undefined"
       ? Buffer.from(b64 + pad, "base64").toString("utf8")
       : atob(b64 + pad);
+
   return str;
 }
 
@@ -49,15 +56,18 @@ async function hmacSha256(secret: string, data: string) {
     false,
     ["sign", "verify"]
   );
+
   const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
   return new Uint8Array(sig);
 }
 
 function parseExpiresIn(value: string) {
   const match = /^(\d+)([smhd])$/.exec(value);
-  if (!match) return 7 * 24 * 60 * 60;
+  if (!match) return 60 * 60 * 24 * 7;
+
   const amount = Number(match[1]);
   const unit = match[2];
+
   switch (unit) {
     case "s":
       return amount;
@@ -66,47 +76,70 @@ function parseExpiresIn(value: string) {
     case "h":
       return amount * 60 * 60;
     case "d":
-      return amount * 24 * 60 * 60;
+      return amount * 60 * 60 * 24;
     default:
-      return 7 * 24 * 60 * 60;
+      return 60 * 60 * 24 * 7;
   }
 }
 
 export function getSessionMaxAgeSeconds() {
-  return parseExpiresIn(process.env.JWT_EXPIRES_IN ?? "7d");
+  return parseExpiresIn(process.env.JWT_EXPIRES_IN || "7d");
+}
+
+export function getSessionCookieOptions(maxAge: number) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: SESSION_COOKIE_PATH,
+    maxAge,
+  };
+}
+
+export function getExpiredSessionCookieOptions() {
+  return getSessionCookieOptions(0);
 }
 
 export async function signSession(payload: SessionPayload) {
-  const iat = Math.floor(Date.now() / 1000);
-  const exp = iat + getSessionMaxAgeSeconds();
-
   const header = { alg: "HS256", typ: "JWT" };
-  const body: JwtPayload = { ...payload, iat, exp };
 
-  const headerPart = base64urlEncode(JSON.stringify(header));
-  const bodyPart = base64urlEncode(JSON.stringify(body));
-  const signingInput = `${headerPart}.${bodyPart}`;
-  const signature = await hmacSha256(getJwtSecret(), signingInput);
-  const sigPart = base64urlEncode(signature);
-  return `${signingInput}.${sigPart}`;
+  const now = Math.floor(Date.now() / 1000);
+  const exp = now + getSessionMaxAgeSeconds();
+
+  const fullPayload: JwtPayload = {
+    ...payload,
+    iat: now,
+    exp,
+  };
+
+  const encodedHeader = base64UrlEncode(JSON.stringify(header));
+  const encodedPayload = base64UrlEncode(JSON.stringify(fullPayload));
+  const unsignedToken = `${encodedHeader}.${encodedPayload}`;
+
+  const signature = await hmacSha256(getJwtSecret(), unsignedToken);
+  const encodedSignature = base64UrlEncode(signature);
+
+  return `${unsignedToken}.${encodedSignature}`;
 }
 
-export async function verifySession(token: string) {
-  const [headerPart, bodyPart, sigPart] = token.split(".");
-  if (!headerPart || !bodyPart || !sigPart) {
-    throw new Error("Invalid token");
-  }
+export async function verifySession(token: string): Promise<JwtPayload | null> {
+  try {
+    const [encodedHeader, encodedPayload, encodedSignature] = token.split(".");
+    if (!encodedHeader || !encodedPayload || !encodedSignature) return null;
 
-  const signingInput = `${headerPart}.${bodyPart}`;
-  const expected = await hmacSha256(getJwtSecret(), signingInput);
-  const expectedSig = base64urlEncode(expected);
-  if (expectedSig !== sigPart) {
-    throw new Error("Invalid signature");
-  }
+    const unsignedToken = `${encodedHeader}.${encodedPayload}`;
+    const expectedSignature = await hmacSha256(getJwtSecret(), unsignedToken);
+    const expectedEncodedSignature = base64UrlEncode(expectedSignature);
 
-  const payload = JSON.parse(base64urlDecode(bodyPart)) as JwtPayload;
-  if (!payload?.exp || payload.exp < Math.floor(Date.now() / 1000)) {
-    throw new Error("Token expired");
+    if (expectedEncodedSignature !== encodedSignature) return null;
+
+    const payload = JSON.parse(base64UrlDecode(encodedPayload)) as JwtPayload;
+
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.exp <= now) return null;
+
+    return payload;
+  } catch {
+    return null;
   }
-  return payload;
 }

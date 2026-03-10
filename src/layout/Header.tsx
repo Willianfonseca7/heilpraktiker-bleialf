@@ -56,7 +56,6 @@ export function Header({
   }, [initialUser]);
 
   useEffect(() => {
-    if (!isAdminRoute) return;
     let active = true;
     getCurrentUser()
       .then((nextUser) => {
@@ -81,7 +80,7 @@ export function Header({
     return () => {
       active = false;
     };
-  }, [isAdminRoute, pathname]);
+  }, [pathname]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -121,7 +120,12 @@ export function Header({
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
-    router.replace("/admin/login");
+    if (isAdminRoute) {
+      router.replace("/admin/login");
+    } else {
+      router.push("/");
+      router.refresh();
+    }
     router.refresh();
   };
 
@@ -203,7 +207,7 @@ export function Header({
             ? "1px solid rgba(16, 185, 129, 0.14)"
             : "1px solid transparent",
           backdropFilter: scrolled ? "blur(10px)" : "none",
-          boxShadow: scrolled ? "0 8px 24px rgba(15, 23, 42, 0.06)" : "none",
+          boxShadow: scrolled ? "0 2px 10px rgba(15, 23, 42, 0.06)" : "none",
           transition:
             "background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, backdrop-filter 180ms ease",
         }}
@@ -361,28 +365,71 @@ export function Header({
                     {item.label}
                   </Button>
                 ))}
-                <Button
-                  component={Link}
-                  href={contactItem.path}
-                  variant="outlined"
-                  color="inherit"
-                  sx={{
-                    borderRadius: 999,
-                    px: 2.5,
-                    fontWeight: 700,
-                    textTransform: "none",
-                    color: "#ffffff",
-                    borderColor: "#059669",
-                    bgcolor: "#059669",
-                    boxShadow: "0 10px 18px rgba(5, 150, 105, 0.18)",
-                    "&:hover": {
-                      borderColor: "#047857",
-                      bgcolor: "#047857",
-                    },
-                  }}
-                >
-                  {contactItem.label}
-                </Button>
+                {role ? (
+                  <>
+                    <Box
+                      sx={{
+                        minWidth: 38,
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        bgcolor: "#ffffff",
+                        border: "1px solid rgba(16, 185, 129, 0.18)",
+                        display: "grid",
+                        placeItems: "center",
+                        fontWeight: 800,
+                        letterSpacing: 0.4,
+                        color: "#047857",
+                        boxShadow: "0 4px 14px rgba(15, 23, 42, 0.05)",
+                      }}
+                    >
+                      {userInitials || "US"}
+                    </Box>
+                    <Button
+                      onClick={handleLogout}
+                      variant="outlined"
+                      color="inherit"
+                      sx={{
+                        borderRadius: 999,
+                        px: 2.5,
+                        fontWeight: 700,
+                        textTransform: "none",
+                        color: "#065f46",
+                        borderColor: "rgba(16, 185, 129, 0.22)",
+                        bgcolor: "rgba(255,255,255,0.78)",
+                        "&:hover": {
+                          borderColor: "rgba(16, 185, 129, 0.34)",
+                          bgcolor: "rgba(16, 185, 129, 0.08)",
+                        },
+                      }}
+                    >
+                      Abmelden
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    component={Link}
+                    href={contactItem.path}
+                    variant="outlined"
+                    color="inherit"
+                    sx={{
+                      borderRadius: 999,
+                      px: 2.5,
+                      fontWeight: 700,
+                      textTransform: "none",
+                      color: "#ffffff",
+                      borderColor: "#059669",
+                      bgcolor: "#059669",
+                      boxShadow: "0 10px 18px rgba(5, 150, 105, 0.18)",
+                      "&:hover": {
+                        borderColor: "#047857",
+                        bgcolor: "#047857",
+                      },
+                    }}
+                  >
+                    {contactItem.label}
+                  </Button>
+                )}
               </>
             )}
           </Stack>
