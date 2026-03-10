@@ -11,7 +11,15 @@ export function Section({ title, subtitle, mt = { xs: 6, md: 10 }, children }: S
   return (
     <Box sx={{ mt }}>
       {title && (
-        <Typography variant="h4" sx={{ fontWeight: 700, color: "primary.main", mb: subtitle ? 1 : 3 }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 700,
+            color: "primary.dark",
+            mb: subtitle ? 1 : 3,
+            letterSpacing: -0.3,
+          }}
+        >
           {title}
         </Typography>
       )}

@@ -18,14 +18,18 @@ export function FeatureCard({ title, image, items, href, buttonLabel }: FeatureC
         textDecoration: "none",
         color: "inherit",
         border: "1px solid",
-        borderColor: "divider",
+        borderColor: "rgba(5,150,105,0.12)",
         bgcolor: "background.paper",
         display: "grid",
         gridTemplateRows: "180px 1fr",
-        transition: "transform 200ms ease, box-shadow 200ms ease",
+        borderRadius: 3,
+        overflow: "hidden",
+        boxShadow: "0 8px 22px rgba(15, 23, 42, 0.04)",
+        transition: "transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease",
         "&:hover": {
           transform: "translateY(-2px)",
-          boxShadow: "0 16px 32px rgba(0,0,0,0.12)",
+          borderColor: "rgba(5,150,105,0.22)",
+          boxShadow: "0 16px 30px rgba(15, 23, 42, 0.08)",
         },
       }}
     >
@@ -49,7 +53,7 @@ export function FeatureCard({ title, image, items, href, buttonLabel }: FeatureC
         />
       </Box>
       <Box sx={{ p: 3, display: "grid", gap: 1.5 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main", mb: 1 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.dark", mb: 1 }}>
           {title}
         </Typography>
         <Box component="ul" sx={{ m: 0, pl: 2, color: "text.secondary" }}>

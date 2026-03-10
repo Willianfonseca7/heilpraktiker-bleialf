@@ -5,6 +5,7 @@ import { PageContainer } from "../../components/ui/PageContainer";
 import { Section } from "../../components/ui/Section";
 import { FeatureCard } from "../../components/ui/FeatureCard";
 import { PrimaryCTAButton, SecondaryCTAButton } from "../../components/ui/Buttons";
+import VNSSection from "@/components/home/VNSSection";
 import { homeFeatureCards, homeHeroSlides } from "../../config/homeContent";
 
 const heroGridSx = {
@@ -15,42 +16,46 @@ const heroGridSx = {
 } as const;
 
 const objectiveWrapperSx = {
-  mt: { xs: 6, md: 10 },
+  mt: { xs: 8, md: 12 },
   display: "flex",
   justifyContent: "center",
 } as const;
 
+const sectionSpacingSx = {
+  xs: 8,
+  md: 12,
+} as const;
+
 const objectiveCardSx = {
-  bgcolor: "primary.main",
-  background:
-    "linear-gradient(135deg, rgba(5,150,105,1) 0%, rgba(5,150,105,0.92) 50%, rgba(5,150,105,0.84) 100%)",
-  color: "common.white",
+  bgcolor: "rgba(5,150,105,0.06)",
+  color: "text.primary",
   p: { xs: 3, md: 6 },
   maxWidth: 900,
-  borderTop: "3px solid",
-  borderColor: "secondary.main",
+  border: "1px solid",
+  borderColor: "rgba(5,150,105,0.16)",
+  boxShadow: "0 6px 18px rgba(15, 23, 42, 0.03)",
   position: "relative",
   overflow: "hidden",
 } as const;
 
 const objectiveDecorationTopSx = {
   position: "absolute",
-  right: -40,
-  top: -40,
-  width: 180,
-  height: 180,
+  right: -28,
+  top: -28,
+  width: 120,
+  height: 120,
   borderRadius: "50%",
-  border: "2px solid rgba(255,255,255,0.18)",
+  border: "1px solid rgba(5,150,105,0.12)",
 } as const;
 
 const objectiveDecorationBottomSx = {
   position: "absolute",
-  right: 30,
-  bottom: -60,
-  width: 220,
-  height: 220,
+  right: 24,
+  bottom: -40,
+  width: 160,
+  height: 160,
   borderRadius: "50%",
-  border: "2px solid rgba(255,255,255,0.12)",
+  border: "1px solid rgba(5,150,105,0.08)",
 } as const;
 
 export function Home() {
@@ -80,30 +85,30 @@ export function Home() {
           <Box sx={objectiveCardSx}>
             <Box aria-hidden sx={objectiveDecorationTopSx} />
             <Box aria-hidden sx={objectiveDecorationBottomSx} />
-            <Typography variant="h5" sx={{ fontWeight: 700, color: "common.white" }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: "primary.dark" }}>
               Unser Ziel ist es, möglichst lange gesund und aktiv zu leben!
             </Typography>
 
-            <Typography sx={{ mt: 2, color: "rgba(255,255,255,0.9)" }}>
+            <Typography sx={{ mt: 2, color: "rgba(22,53,42,0.8)" }}>
               Um dieses Ziel der Gesunderhaltung zu erreichen, ist eine vorsorgliche Diagnostik
               vonnöten. Wenn wir vorsorglich, in dem hochkomplexen System Mensch, Abweichungen von
               der Norm entdecken und dann beeinflussen, können wir vielfach Gesundheit erhalten.
             </Typography>
 
-            <Typography sx={{ mt: 2, color: "rgba(255,255,255,0.9)" }}>
+            <Typography sx={{ mt: 2, color: "rgba(22,53,42,0.8)" }}>
               Eine frühest mögliche Therapie basiert immer auf einer frühest möglichen Diagnostik.
               Diese Diagnostik sollte den Menschen von den verschiedensten Ebenen aus betrachten um
               Informationen über einen Zustand finden zu können, bevor Strukturschäden (Defekte)
               sich entwickelt haben.
             </Typography>
 
-            <Typography sx={{ mt: 2, color: "rgba(255,255,255,0.9)" }}>
+            <Typography sx={{ mt: 2, color: "rgba(22,53,42,0.8)" }}>
               Deshalb sind wir ein Team von motivierten Therapeuten, aus den verschiedensten
               Bereichen, welches engagiert versucht unser Konzept für Ihre Gesunderhaltung
               umzusetzen.
             </Typography>
 
-            <Typography sx={{ mt: 3, color: "rgba(255,255,255,0.9)" }}>
+            <Typography sx={{ mt: 3, color: "rgba(6,95,70,0.86)", fontWeight: 500 }}>
               Mit freundlichen Grüßen
               <br />
               Johannes Willems
@@ -111,7 +116,7 @@ export function Home() {
           </Box>
         </Box>
 
-        <Section title="Unsere Schwerpunkte">
+        <Section title="Unsere Schwerpunkte" mt={sectionSpacingSx}>
           <Box
             sx={{
               display: "grid",
@@ -125,7 +130,11 @@ export function Home() {
           </Box>
         </Section>
 
-        <Section title="Schmerzfrei ohne Medikamente?">
+        <Box sx={{ mt: sectionSpacingSx }}>
+          <VNSSection />
+        </Box>
+
+        <Section title="Schmerzfrei ohne Medikamente?" mt={sectionSpacingSx}>
           <Box
             sx={{
               border: "1px solid",
