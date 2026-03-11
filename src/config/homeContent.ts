@@ -1,7 +1,7 @@
 import type { FeatureCardItem, HeroSlide } from "../types/home";
 
 export const homeHeroSlides: HeroSlide[] = [
-  { key: "akupunktur", label: "Akupunktur & TCM", image: "/hero/acumpuntua.jpg" },
+  { key: "akupunktur", label: "Akupunktur & TCM", image: "/images/behandlungen/akupunktur.jpg" },
   { key: "psychotherapie", label: "Psychotherapie", image: "/hero/pinscicologie.jpg" },
   { key: "lerntherapie", label: "Pädagogik & Lerntherapie", image: "/hero/kindertherapie.jpg" },
 ];
@@ -9,7 +9,7 @@ export const homeHeroSlides: HeroSlide[] = [
 export const homeFeatureCards: FeatureCardItem[] = [
   {
     title: "Iridologie, Homöopathie, Akupunktur",
-    image: "/hero/acumpuntua.jpg",
+    image: "/images/behandlungen/akupunktur.jpg",
     items: [
       "Iridologie",
       "Homöopathie",
@@ -49,7 +49,7 @@ export const homeFeatureCards: FeatureCardItem[] = [
   },
   {
     title: "Interdisziplinäre Therapie",
-    image: "/hero/acumpuntua.jpg",
+    image: "/images/behandlungen/akupunktur.jpg",
     items: [
       "Interdisziplinäre Faszien Therapie (IFT®)",
       "Stress und Schmerz Resilienz nach Gordon Health®",

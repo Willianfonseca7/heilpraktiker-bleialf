@@ -2,7 +2,7 @@ import { createTheme } from "@mui/material/styles";
 
 export const theme = createTheme({
   palette: {
-    primary: { main: "#059669" },
+    primary: { main: "#059669", dark: "#065f46" },
     secondary: { main: "#C7B27A" }, // areia/dourado suave (secundária elegante)
     background: { default: "#f6fbf7", paper: "#ffffff" },
   },
