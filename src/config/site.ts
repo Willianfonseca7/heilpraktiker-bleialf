@@ -7,12 +7,17 @@ export const siteBrand = {
 };
 
 export const navigationItems: NavItem[] = [
-  { label: "Team", path: "/team" },
-  { label: "Kompetenz", path: "/kompetenz" },
-  { label: "Aktuelles", path: "/aktuelles" },
+  { label: "Start", path: "/" },
+  { label: "Unser Team", path: "/team" },
+  { label: "Behandlungen", path: "/behandlungen" },
+  { label: "Praxisräume", path: "/aktuelles" },
+  { label: "Kontakt", path: "/kontakt" },
 ];
 
-export const contactNavItem: NavItem = { label: "Kontakt", path: "/kontakt" };
+export const contactNavItem: NavItem = {
+  label: "Gesundheits-Check",
+  path: "/gesundheits-check",
+};
 
 export const legalNavItems: NavItem[] = [
   { label: "Impressum", path: "/impressum" },

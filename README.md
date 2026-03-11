@@ -30,7 +30,7 @@ Abra `http://localhost:3000`.
 ## Rotas
 - `/` → Home
 - `/team` → Página simples (placeholder)
-- `/kompetenz` → Página simples (placeholder)
+- `/behandlungen` → Página simples (placeholder)
 - `/aktuelles` → Página simples (placeholder)
 - `/kontakt` → Página simples (placeholder)
 - `/disclaimer` → Página simples (placeholder)
