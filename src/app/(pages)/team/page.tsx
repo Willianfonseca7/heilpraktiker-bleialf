@@ -1,6 +1,6 @@
-import TeamCTA from "@/components/team/TeamCTA";
-import TeamGrid from "@/components/team/TeamGrid";
-import TeamHero from "@/components/team/TeamHero";
+import TeamCTA from "@/components/admin-users/team/TeamCTA";
+import TeamGrid from "@/components/admin-users/team/TeamGrid";
+import TeamHero from "@/components/admin-users/team/TeamHero";
 import { teamMembers } from "@/data/team-members";
 
 export default function TeamPage() {
