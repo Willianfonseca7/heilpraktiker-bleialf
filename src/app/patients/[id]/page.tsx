@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import PatientDetail from "@/components/ui/patient-detail";
 
+export const dynamic = "force-dynamic";
+
 type Patient = {
   id: string;
   firstName: string;

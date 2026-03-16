@@ -2,6 +2,8 @@
 import { listPatients } from "@/lib/service/patient.service";
 import PatientsDashboard from "@/components/ui/patients-dashboard";
 
+export const dynamic = "force-dynamic";
+
 export default async function PatientsPage() {
   const { count, data } = await listPatients();
 
