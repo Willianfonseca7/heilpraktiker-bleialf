@@ -4,9 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AdminAppointmentsSection from "@/components/appointments/AdminAppointmentsSection";
+import AdminContactMessagesSection from "@/components/kontakt/AdminContactMessagesSection";
 import Modal from "@/components/Modal";
 import PatientForm from "@/components/PatientForm";
 import { toast } from "sonner";
+import type { ContactMessage } from "@/types/contact";
 
 type Patient = {
   id: string | number;
@@ -24,6 +26,7 @@ type Patient = {
 type PatientsDashboardProps = {
   patients: Patient[];
   total: number;
+  contactMessages: ContactMessage[];
 };
 
 function toDate(value: string | Date) {
@@ -57,7 +60,11 @@ function splitName(fullName: string) {
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
 }
 
-export default function PatientsDashboard({ patients, total }: PatientsDashboardProps) {
+export default function PatientsDashboard({
+  patients,
+  total,
+  contactMessages,
+}: PatientsDashboardProps) {
   // Copia local para poder adicionar via modal (sem backend por enquanto)
   const [items, setItems] = useState<Patient[]>(patients ?? []);
   const [query, setQuery] = useState("");
@@ -283,6 +290,7 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
       </Modal>
 
       <AdminAppointmentsSection />
+      <AdminContactMessagesSection messages={contactMessages} />
     </div>
   );
 }

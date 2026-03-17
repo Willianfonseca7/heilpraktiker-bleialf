@@ -1,12 +1,8 @@
 import { Button } from "@mui/material";
-import type { ElementType, PropsWithChildren } from "react";
+import type { ButtonProps } from "@mui/material";
+import type { PropsWithChildren } from "react";
 
-type CTAButtonProps = PropsWithChildren<{
-  onClick?: () => void;
-  href?: string;
-  to?: string;
-  component?: ElementType;
-}>;
+type CTAButtonProps = PropsWithChildren<ButtonProps>;
 
 export function PrimaryCTAButton({ children, ...rest }: CTAButtonProps) {
   return (

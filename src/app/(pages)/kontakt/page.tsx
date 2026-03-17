@@ -1,5 +1,5 @@
-import { SimplePage } from "../../../features/pages/SimplePage";
+import KontaktPageContent from "@/components/kontakt/KontaktPage";
 
 export default function KontaktPage() {
-  return <SimplePage title="Kontakt" />;
+  return <KontaktPageContent />;
 }
