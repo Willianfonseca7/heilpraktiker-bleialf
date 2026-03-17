@@ -23,6 +23,7 @@ type Props = {
   showActiveField?: boolean;
   roleOptions?: UserRole[];
   submitLabel?: string;
+  showCancelButton?: boolean;
 };
 
 function buildFormValues(
@@ -49,6 +50,7 @@ export default function UserAccountForm({
   showActiveField = true,
   roleOptions = ["ADMIN", "SUPERADMIN"],
   submitLabel,
+  showCancelButton = true,
 }: Props) {
   const [form, setForm] = useState<UserAccountFormValues>(
     buildFormValues(mode, initialData)
@@ -174,13 +176,15 @@ export default function UserAccountForm({
       ) : null}
 
       <div className="flex items-center justify-end gap-2 pt-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="rounded-xl border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-        >
-          Abbrechen
-        </button>
+        {showCancelButton ? (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-xl border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+          >
+            Abbrechen
+          </button>
+        ) : null}
         <button
           type="submit"
           disabled={submitting}

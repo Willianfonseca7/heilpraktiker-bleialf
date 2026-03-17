@@ -1,0 +1,93 @@
+"use client";
+
+import type { AdminAppointment, AppointmentStatus } from "@/types/user";
+
+type AdminAppointmentCardProps = {
+  appointment: AdminAppointment;
+  updating: boolean;
+  onStatusChange: (id: string, status: AppointmentStatus) => void;
+};
+
+const statusLabels: Record<AppointmentStatus, string> = {
+  PENDING: "Offen",
+  CONFIRMED: "Akzeptiert",
+  CANCELED: "Abgelehnt",
+};
+
+const statusClasses: Record<AppointmentStatus, string> = {
+  PENDING: "bg-amber-50 text-amber-700",
+  CONFIRMED: "bg-emerald-50 text-emerald-700",
+  CANCELED: "bg-rose-50 text-rose-700",
+};
+
+export default function AdminAppointmentCard({
+  appointment,
+  updating,
+  onStatusChange,
+}: AdminAppointmentCardProps) {
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">
+            {appointment.user.firstName} {appointment.user.lastName}
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">{appointment.user.email}</p>
+        </div>
+        <span
+          className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[appointment.status]}`}
+        >
+          {statusLabels[appointment.status]}
+        </span>
+      </div>
+
+      <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+        <div>
+          <dt className="font-medium text-slate-900">Behandlung</dt>
+          <dd className="mt-1">{appointment.treatment}</dd>
+        </div>
+        <div>
+          <dt className="font-medium text-slate-900">Behandler</dt>
+          <dd className="mt-1">{appointment.doctor ?? "Automatisch zuweisen"}</dd>
+        </div>
+        <div>
+          <dt className="font-medium text-slate-900">Anfrage vom</dt>
+          <dd className="mt-1">
+            {new Date(appointment.createdAt).toLocaleDateString("de-DE")}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-slate-900">Status</dt>
+          <dd className="mt-1">{statusLabels[appointment.status]}</dd>
+        </div>
+      </dl>
+
+      {appointment.message ? (
+        <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+          {appointment.message}
+        </div>
+      ) : null}
+
+      {appointment.status === "PENDING" ? (
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={updating}
+            onClick={() => onStatusChange(appointment.id, "CONFIRMED")}
+            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Akzeptieren
+          </button>
+          <button
+            type="button"
+            disabled={updating}
+            onClick={() => onStatusChange(appointment.id, "CANCELED")}
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Ablehnen
+          </button>
+        </div>
+      ) : null}
+    </article>
+  );
+}

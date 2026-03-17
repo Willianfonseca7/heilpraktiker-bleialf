@@ -31,3 +31,21 @@ export type HealthCheckResult = {
   summary: string;
   recommendations: string[];
 };
+
+export type StoredHealthCheckSession = {
+  clientResultId: string;
+  answers: AnswersMap;
+  result: HealthCheckResult;
+  persistedResultId?: string | null;
+};
+
+export type PersistedHealthCheckResult = {
+  id: string;
+  clientResultId: string;
+  totalScore: number;
+  level: HealthCheckLevel;
+  categoryScores: CategoryScores;
+  summary: string;
+  recommendations: string[];
+  createdAt: string;
+};

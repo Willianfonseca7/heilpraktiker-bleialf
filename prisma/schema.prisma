@@ -12,18 +12,66 @@ enum Role {
   SUPERADMIN
 }
 
-model User {
-  id               String   @id @default(cuid())
-  firstName        String
-  lastName         String
-  email            String   @unique
-  passwordHash     String
-  role             Role     @default(USER)
-  isActive         Boolean  @default(true)
-  sessionExpiresAt DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+enum HealthCheckLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
 
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  firstName          String
+  lastName           String
+  email              String   @unique
+  passwordHash       String
+  role               Role     @default(USER)
+  isActive           Boolean  @default(true)
+  sessionExpiresAt   DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  healthCheckResults HealthCheckResult[]
+  appointments       Appointment[]
+}
+
+model HealthCheckResult {
+  id              String           @id @default(cuid())
+  userId          String
+  clientResultId  String
+  answers         Json
+  totalScore      Int
+  level           HealthCheckLevel
+  categoryScores  Json
+  summary         String
+  recommendations Json
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, clientResultId])
+  @@index([userId, createdAt])
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  userId    String
+  treatment String
+  doctor    String?
+  message   String?
+  status    AppointmentStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
 }
 
 model TestTable {

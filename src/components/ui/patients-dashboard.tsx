@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import AdminAppointmentsSection from "@/components/appointments/AdminAppointmentsSection";
 import Modal from "@/components/Modal";
 import PatientForm from "@/components/PatientForm";
 import { toast } from "sonner";
@@ -280,6 +281,8 @@ export default function PatientsDashboard({ patients, total }: PatientsDashboard
           submitLabel="Speichern"
         />
       </Modal>
+
+      <AdminAppointmentsSection />
     </div>
   );
 }

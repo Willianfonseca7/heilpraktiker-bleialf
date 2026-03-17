@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { HealthCheckResult } from "@/features/health-check/types";
-import { getHealthCheckResult } from "@/features/health-check/utils/storage";
+import {
+  getStoredHealthCheckSession,
+  savePersistedHealthCheckResultId,
+} from "@/features/health-check/utils/storage";
 import LockedResultCard from "@/components/health-check/LockedResultCard";
 import ResultSummaryCard from "@/components/health-check/ResultSummaryCard";
+import { saveHealthCheckResult as persistHealthCheckResult } from "@/lib/health-check-api";
 
 type SessionUser = {
   id: string;
@@ -21,16 +25,17 @@ export default function GesundheitsCheckResultPage() {
   const [result, setResult] = useState<HealthCheckResult | null>(null);
   const [user, setUser] = useState<SessionUser | null>(null);
   const [sessionResolved, setSessionResolved] = useState(false);
+  const [isPersisting, setIsPersisting] = useState(false);
 
   useEffect(() => {
-    const storedResult = getHealthCheckResult();
+    const storedSession = getStoredHealthCheckSession();
 
-    if (!storedResult) {
+    if (!storedSession) {
       router.replace("/gesundheits-check");
       return;
     }
 
-    setResult(storedResult);
+    setResult(storedSession.result);
   }, [router]);
 
   useEffect(() => {
@@ -84,6 +89,42 @@ export default function GesundheitsCheckResultPage() {
     setUser(data.user ?? null);
     router.refresh();
   };
+
+  useEffect(() => {
+    let active = true;
+
+    async function persistCurrentResult() {
+      if (!user || isPersisting) return;
+
+      const storedSession = getStoredHealthCheckSession();
+      if (!storedSession || storedSession.persistedResultId) return;
+
+      try {
+        setIsPersisting(true);
+
+        const saved = await persistHealthCheckResult({
+          clientResultId: storedSession.clientResultId,
+          answers: storedSession.answers,
+          result: storedSession.result,
+        });
+
+        if (!active) return;
+        savePersistedHealthCheckResultId(saved.id);
+      } catch {
+        if (!active) return;
+      } finally {
+        if (active) {
+          setIsPersisting(false);
+        }
+      }
+    }
+
+    persistCurrentResult();
+
+    return () => {
+      active = false;
+    };
+  }, [user, isPersisting]);
 
   if (!result) {
     return null;

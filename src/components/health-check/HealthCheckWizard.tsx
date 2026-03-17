@@ -7,6 +7,7 @@ import type { AnswersMap } from "@/features/health-check/types";
 import { calculateHealthCheckResult } from "@/features/health-check/utils/scoring";
 import { enrichHealthCheckResult } from "@/features/health-check/utils/recommendations";
 import {
+  saveHealthCheckClientResultId,
   saveHealthCheckAnswers,
   saveHealthCheckResult,
 } from "@/features/health-check/utils/storage";
@@ -42,9 +43,11 @@ export default function HealthCheckWizard() {
     if (isLastStep) {
       const baseResult = calculateHealthCheckResult(answers);
       const fullResult = enrichHealthCheckResult(baseResult);
+      const clientResultId = crypto.randomUUID();
 
       saveHealthCheckAnswers(answers);
       saveHealthCheckResult(fullResult);
+      saveHealthCheckClientResultId(clientResultId);
 
       router.push("/gesundheits-check/result");
       return;

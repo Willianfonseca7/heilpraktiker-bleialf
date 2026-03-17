@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import AuthModal, { type AuthMode } from "@/components/auth/AuthModal";
 import type { NavItem } from "../types/navigation";
 import type { CurrentUser, UserRole } from "../types/user";
 import { getCurrentUser, updateCurrentUser } from "@/lib/account-api";
@@ -48,6 +49,8 @@ export function Header({
   const [user, setUser] = useState<AdminNavbarUser | null>(initialUser);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountSubmitting, setAccountSubmitting] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [scrolled, setScrolled] = useState(false);
   const role = user?.role ?? null;
 
@@ -189,6 +192,16 @@ export function Header({
     } finally {
       setAccountSubmitting(false);
     }
+  };
+
+  const openLogin = () => {
+    setAuthMode("login");
+    setAuthModalOpen(true);
+  };
+
+  const openRegister = () => {
+    setAuthMode("register");
+    setAuthModalOpen(true);
   };
 
   return (
@@ -368,6 +381,8 @@ export function Header({
                 {role ? (
                   <>
                     <Box
+                      component={Link}
+                      href="/mein-konto"
                       sx={{
                         minWidth: 38,
                         width: 40,
@@ -380,7 +395,11 @@ export function Header({
                         fontWeight: 800,
                         letterSpacing: 0.4,
                         color: "#047857",
+                        textDecoration: "none",
                         boxShadow: "0 4px 14px rgba(15, 23, 42, 0.05)",
+                        "&:hover": {
+                          bgcolor: "#f7fffb",
+                        },
                       }}
                     >
                       {userInitials || "US"}
@@ -407,28 +426,51 @@ export function Header({
                     </Button>
                   </>
                 ) : (
-                  <Button
-                    component={Link}
-                    href={contactItem.path}
-                    variant="outlined"
-                    color="inherit"
-                    sx={{
-                      borderRadius: 999,
-                      px: 2.5,
-                      fontWeight: 700,
-                      textTransform: "none",
-                      color: "#ffffff",
-                      borderColor: "#059669",
-                      bgcolor: "#059669",
-                      boxShadow: "0 10px 18px rgba(5, 150, 105, 0.18)",
-                      "&:hover": {
-                        borderColor: "#047857",
-                        bgcolor: "#047857",
-                      },
-                    }}
-                  >
-                    {contactItem.label}
-                  </Button>
+                  <>
+                    <Button
+                      onClick={openLogin}
+                      variant="outlined"
+                      color="inherit"
+                      sx={{
+                        borderRadius: 999,
+                        px: 2.5,
+                        fontWeight: 700,
+                        textTransform: "none",
+                        color: "#065f46",
+                        borderColor: "rgba(16, 185, 129, 0.22)",
+                        bgcolor: "rgba(255,255,255,0.78)",
+                        "&:hover": {
+                          borderColor: "rgba(16, 185, 129, 0.34)",
+                          bgcolor: "rgba(16, 185, 129, 0.08)",
+                          color: "#059669",
+                        },
+                      }}
+                    >
+                      Anmelden/Registrieren
+                    </Button>
+                    <Button
+                      component={Link}
+                      href={contactItem.path}
+                      variant="outlined"
+                      color="inherit"
+                      sx={{
+                        borderRadius: 999,
+                        px: 2.5,
+                        fontWeight: 700,
+                        textTransform: "none",
+                        color: "#ffffff",
+                        borderColor: "#059669",
+                        bgcolor: "#059669",
+                        boxShadow: "0 10px 18px rgba(5, 150, 105, 0.18)",
+                        "&:hover": {
+                          borderColor: "#047857",
+                          bgcolor: "#047857",
+                        },
+                      }}
+                    >
+                      {contactItem.label}
+                    </Button>
+                  </>
                 )}
               </>
             )}
@@ -444,6 +486,17 @@ export function Header({
         onClose={() => {
           if (accountSubmitting) return;
           setAccountOpen(false);
+        }}
+      />
+
+      <AuthModal
+        isOpen={authModalOpen}
+        mode={authMode}
+        onClose={() => setAuthModalOpen(false)}
+        onSwitchMode={setAuthMode}
+        onAuthSuccess={() => {
+          setAuthModalOpen(false);
+          router.refresh();
         }}
       />
     </>

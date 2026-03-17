@@ -1,4 +1,5 @@
 export type UserRole = "SUPERADMIN" | "ADMIN" | "USER";
+export type AppointmentStatus = "PENDING" | "CONFIRMED" | "CANCELED";
 
 export type User = {
   id: string;
@@ -44,4 +45,28 @@ export type UpdateOwnProfilePayload = {
   lastName?: string;
   email?: string;
   password?: string;
+};
+
+export type Appointment = {
+  id: string;
+  treatment: string;
+  doctor: string | null;
+  message: string | null;
+  status: AppointmentStatus;
+  createdAt: string;
+  updatedAt?: string;
+};
+
+export type CreateAppointmentPayload = {
+  treatment: string;
+  doctor?: string;
+  message?: string;
+};
+
+export type AdminAppointment = Appointment & {
+  user: Pick<User, "id" | "firstName" | "lastName" | "email">;
+};
+
+export type UpdateAppointmentStatusPayload = {
+  status: AppointmentStatus;
 };

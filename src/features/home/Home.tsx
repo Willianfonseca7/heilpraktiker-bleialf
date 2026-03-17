@@ -1,10 +1,12 @@
 import { Box, Typography } from "@mui/material";
 import LocalFloristOutlinedIcon from "@mui/icons-material/LocalFloristOutlined";
+import Link from "next/link";
 import { HeroSlider } from "./components/HeroSlider";
 import { PageContainer } from "../../components/ui/PageContainer";
 import { Section } from "../../components/ui/Section";
 import { FeatureCard } from "../../components/ui/FeatureCard";
-import { PrimaryCTAButton, SecondaryCTAButton } from "../../components/ui/Buttons";
+import { SecondaryCTAButton } from "../../components/ui/Buttons";
+import AppointmentPrimaryCTAButton from "@/components/appointments/AppointmentPrimaryCTAButton";
 import VNSSection from "@/components/home/VNSSection";
 import { homeFeatureCards, homeHeroSlides } from "../../config/homeContent";
 
@@ -73,8 +75,13 @@ export function Home() {
             </Typography>
 
             <Box sx={{ display: "flex", gap: 2, mt: 4, flexWrap: "wrap" }}>
-              <PrimaryCTAButton>Termin anfragen</PrimaryCTAButton>
-              <SecondaryCTAButton>Unser Team</SecondaryCTAButton>
+              <AppointmentPrimaryCTAButton
+                defaultTreatment="Akupunktur"
+                preferredTreatments={["Akupunktur", "Psychotherapie", "Lerntherapeutisches Training"]}
+              />
+              <SecondaryCTAButton component={Link} href="/team">
+                Unser Team
+              </SecondaryCTAButton>
             </Box>
           </Box>
 

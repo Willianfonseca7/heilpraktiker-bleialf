@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import AppointmentRequestModal from "@/components/appointments/AppointmentRequestModal";
 import type { HealthCheckResult } from "@/features/health-check/types";
 
 type ResultSummaryCardProps = {
@@ -26,6 +28,7 @@ export default function ResultSummaryCard({
   result,
   firstName,
 }: ResultSummaryCardProps) {
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
   const topCategories = Object.entries(result.categoryScores)
     .sort((a, b) => b[1] - a[1])
     .filter(([, score]) => score > 0)
@@ -83,9 +86,23 @@ export default function ResultSummaryCard({
         </div>
 
         <div className="rounded-2xl border border-gray-200 p-5">
-          <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-            Empfohlene nächste Schritte
-          </p>
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                Empfohlene nächste Schritte
+              </p>
+              <p className="mt-2 text-sm text-gray-600">
+                Auf Wunsch koennen Sie direkt eine passende Beratung anfragen.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setAppointmentOpen(true)}
+              className="inline-flex rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-emerald-700"
+            >
+              Termin anfragen
+            </button>
+          </div>
           <ul className="mt-4 space-y-3">
             {result.recommendations.map((recommendation) => (
               <li
@@ -98,6 +115,13 @@ export default function ResultSummaryCard({
           </ul>
         </div>
       </div>
+
+      <AppointmentRequestModal
+        isOpen={appointmentOpen}
+        onClose={() => setAppointmentOpen(false)}
+        defaultTreatment={result.recommendations[0]}
+        preferredTreatments={result.recommendations}
+      />
     </div>
   );
 }

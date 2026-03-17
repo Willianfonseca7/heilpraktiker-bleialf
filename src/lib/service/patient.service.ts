@@ -1,5 +1,6 @@
 // src/lib/service/patient.service.ts
 import { prisma } from "@/lib/db";
+import type { SessionPayload } from "@/lib/auth";
 
 export async function listPatients() {
   const rows = await prisma.patient.findMany({
@@ -45,4 +46,28 @@ export async function createPatient(input: {
 
   const count = await prisma.patient.count();
   return { created, count };
+}
+
+export async function ensurePatientExistsForSession(session: SessionPayload) {
+  const email = session.email.trim();
+
+  if (!email) {
+    return null;
+  }
+
+  const existing = await prisma.patient.findUnique({
+    where: { email },
+  });
+
+  if (existing) {
+    return existing;
+  }
+
+  return prisma.patient.create({
+    data: {
+      firstName: session.firstName.trim(),
+      lastName: session.lastName.trim(),
+      email,
+    },
+  });
 }
