@@ -1,3 +1,5 @@
+import AppointmentSecondaryCTAButton from "@/components/appointments/AppointmentSecondaryCTAButton";
+
 export default function BehandlungenCTA() {
   return (
     <section className="py-20 bg-gray-100">
@@ -12,9 +14,10 @@ export default function BehandlungenCTA() {
           und finden gemeinsam den passenden Weg.
         </p>
 
-        <button className="px-6 py-3 bg-black text-white rounded-lg">
-          Termin anfragen
-        </button>
+        <AppointmentSecondaryCTAButton
+          defaultTreatment="Akupunktur"
+          preferredTreatments={["Akupunktur", "Psychotherapie", "Lerntherapeutisches Training"]}
+        />
 
       </div>
     </section>

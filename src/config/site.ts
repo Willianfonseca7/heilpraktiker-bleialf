@@ -10,7 +10,6 @@ export const navigationItems: NavItem[] = [
   { label: "Start", path: "/" },
   { label: "Unser Team", path: "/team" },
   { label: "Behandlungen", path: "/behandlungen" },
-  { label: "Praxisräume", path: "/aktuelles" },
   { label: "Kontakt", path: "/kontakt" },
 ];
 

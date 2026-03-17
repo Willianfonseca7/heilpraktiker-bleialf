@@ -65,6 +65,7 @@ model Appointment {
   doctor    String?
   message   String?
   status    AppointmentStatus @default(PENDING)
+  scheduledAt DateTime?
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
 

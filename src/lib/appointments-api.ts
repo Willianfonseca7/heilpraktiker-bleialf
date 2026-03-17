@@ -1,6 +1,6 @@
 import type { Appointment, CreateAppointmentPayload } from "@/types/user";
 
-class AppointmentApiError extends Error {
+export class AppointmentApiError extends Error {
   status: number;
 
   constructor(message: string, status: number) {
@@ -45,4 +45,22 @@ export async function getOwnAppointments(): Promise<Appointment[]> {
 
   const data = await parseJson<{ appointments: Appointment[] }>(res);
   return data.appointments;
+}
+
+export async function getUnavailableAppointmentSlots(
+  doctor: string,
+  date: string
+): Promise<string[]> {
+  const searchParams = new URLSearchParams({
+    doctor,
+    date,
+  });
+
+  const res = await fetch(`/api/appointments/availability?${searchParams.toString()}`, {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  const data = await parseJson<{ unavailableSlots: string[] }>(res);
+  return data.unavailableSlots;
 }

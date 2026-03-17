@@ -17,7 +17,7 @@ export default function TeamPage() {
         title="Unsicher welche Behandlung für Sie geeignet ist?"
         description="Starten Sie unseren Gesundheits-Check und erhalten Sie eine erste Empfehlung."
         buttonLabel="Gesundheits-Check starten"
-        href="/#health-check"
+        href="/gesundheits-check"
       />
     </>
   );

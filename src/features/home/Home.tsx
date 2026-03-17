@@ -74,13 +74,25 @@ export function Home() {
               Akupunktur, Psychotherapie und Lerntherapie – interdisziplinär, individuell und menschlich.
             </Typography>
 
+            <Typography
+              sx={{
+                mt: 2,
+                color: "primary.main",
+                fontWeight: 700,
+                maxWidth: 680,
+                fontSize: { xs: "1rem", md: "1.05rem" },
+              }}
+            >
+              Jetzt Termin online buchen – schnell und unkompliziert.
+            </Typography>
+
             <Box sx={{ display: "flex", gap: 2, mt: 4, flexWrap: "wrap" }}>
               <AppointmentPrimaryCTAButton
                 defaultTreatment="Akupunktur"
                 preferredTreatments={["Akupunktur", "Psychotherapie", "Lerntherapeutisches Training"]}
               />
-              <SecondaryCTAButton component={Link} href="/team">
-                Unser Team
+              <SecondaryCTAButton component={Link} href="/gesundheits-check">
+                Gesundheits-Check starten
               </SecondaryCTAButton>
             </Box>
           </Box>

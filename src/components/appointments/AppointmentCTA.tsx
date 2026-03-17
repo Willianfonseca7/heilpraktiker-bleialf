@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import AppointmentRequestModal from "@/components/appointments/AppointmentRequestModal";
-import AuthModal, { type AuthMode } from "@/components/auth/AuthModal";
-import { getCurrentUser } from "@/lib/account-api";
 
 type TriggerRenderProps = {
   onClick: () => void;
@@ -21,39 +19,15 @@ export default function AppointmentCTA({
   preferredTreatments,
   children,
 }: AppointmentCTAProps) {
-  const [authOpen, setAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<AuthMode>("register");
   const [appointmentOpen, setAppointmentOpen] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(false);
 
-  const handleClick = async () => {
-    setCheckingSession(true);
-
-    try {
-      await getCurrentUser();
-      setAppointmentOpen(true);
-    } catch {
-      setAuthMode("register");
-      setAuthOpen(true);
-    } finally {
-      setCheckingSession(false);
-    }
+  const handleClick = () => {
+    setAppointmentOpen(true);
   };
 
   return (
     <>
-      {children({ onClick: handleClick, disabled: checkingSession })}
-
-      <AuthModal
-        isOpen={authOpen}
-        mode={authMode}
-        onClose={() => setAuthOpen(false)}
-        onSwitchMode={setAuthMode}
-        onAuthSuccess={() => {
-          setAuthOpen(false);
-          setAppointmentOpen(true);
-        }}
-      />
+      {children({ onClick: handleClick, disabled: false })}
 
       <AppointmentRequestModal
         isOpen={appointmentOpen}

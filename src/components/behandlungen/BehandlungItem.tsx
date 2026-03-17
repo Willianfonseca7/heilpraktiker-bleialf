@@ -54,7 +54,7 @@ export default function BehandlungItem({
                     disabled={disabled}
                     className="mt-5 inline-flex rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {disabled ? "Wird geprüft..." : "Termin anfragen"}
+                    {disabled ? "Wird geprüft..." : "Termin online buchen"}
                   </button>
                 )}
               </AppointmentCTA>

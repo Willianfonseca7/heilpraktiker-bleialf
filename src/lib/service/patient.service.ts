@@ -1,6 +1,11 @@
 // src/lib/service/patient.service.ts
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import type { SessionPayload } from "@/lib/auth";
+
+function safeTrim(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
 
 export async function listPatients() {
   const rows = await prisma.patient.findMany({
@@ -49,7 +54,7 @@ export async function createPatient(input: {
 }
 
 export async function ensurePatientExistsForSession(session: SessionPayload) {
-  const email = session.email.trim();
+  const email = safeTrim(session.email);
 
   if (!email) {
     return null;
@@ -63,11 +68,28 @@ export async function ensurePatientExistsForSession(session: SessionPayload) {
     return existing;
   }
 
-  return prisma.patient.create({
-    data: {
-      firstName: session.firstName.trim(),
-      lastName: session.lastName.trim(),
-      email,
-    },
-  });
+  const firstName = safeTrim(session.firstName) || "Online";
+  const lastName = safeTrim(session.lastName) || "Anfrage";
+
+  try {
+    return await prisma.patient.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+      },
+    });
+  } catch (error) {
+    // If another request created the patient in parallel, reuse it.
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return prisma.patient.findUnique({
+        where: { email },
+      });
+    }
+
+    throw error;
+  }
 }

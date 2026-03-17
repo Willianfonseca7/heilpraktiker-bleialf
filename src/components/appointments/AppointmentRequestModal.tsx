@@ -1,13 +1,33 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createAppointment } from "@/lib/appointments-api";
+import {
+  AppointmentApiError,
+  createAppointment,
+  getUnavailableAppointmentSlots,
+} from "@/lib/appointments-api";
+import AuthModal, { type AuthMode } from "@/components/auth/AuthModal";
+import { getCurrentUser } from "@/lib/account-api";
 import {
   clinicTreatments,
   getPractitionersForTreatment,
   getPreferredClinicTreatment,
 } from "@/data/clinic-offerings";
+import {
+  APPOINTMENT_TIME_SLOTS,
+  createLocalDateTime,
+} from "@/lib/appointment-slots";
+
+function getTodayDateValue() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 type AppointmentRequestModalProps = {
   isOpen: boolean;
@@ -22,10 +42,18 @@ export default function AppointmentRequestModal({
   defaultTreatment,
   preferredTreatments,
 }: AppointmentRequestModalProps) {
+  const router = useRouter();
   const [treatment, setTreatment] = useState(defaultTreatment ?? clinicTreatments[0]);
   const [doctor, setDoctor] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [unavailableSlots, setUnavailableSlots] = useState<string[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("register");
+  const [pendingPayload, setPendingPayload] = useState<Parameters<typeof createAppointment>[0] | null>(null);
   const doctorOptions = useMemo(
     () => getPractitionersForTreatment(treatment),
     [treatment]
@@ -39,6 +67,10 @@ export default function AppointmentRequestModal({
 
     setTreatment(initialTreatment);
     setMessage("");
+    setSelectedDate(getTodayDateValue());
+    setSelectedTime("");
+    setUnavailableSlots([]);
+    setPendingPayload(null);
   }, [defaultTreatment, isOpen, preferredTreatments]);
 
   useEffect(() => {
@@ -49,6 +81,40 @@ export default function AppointmentRequestModal({
       setDoctor(nextDoctor);
     }
   }, [doctor, doctorOptions, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !doctor || !selectedDate) return;
+
+    let active = true;
+    setLoadingSlots(true);
+
+    getUnavailableAppointmentSlots(doctor, selectedDate)
+      .then((slots) => {
+        if (!active) return;
+        setUnavailableSlots(slots);
+      })
+      .catch(() => {
+        if (!active) return;
+        setUnavailableSlots([]);
+      })
+      .finally(() => {
+        if (active) {
+          setLoadingSlots(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [doctor, isOpen, selectedDate]);
+
+  useEffect(() => {
+    if (!selectedTime) return;
+
+    if (unavailableSlots.includes(selectedTime)) {
+      setSelectedTime("");
+    }
+  }, [selectedTime, unavailableSlots]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -80,18 +146,51 @@ export default function AppointmentRequestModal({
       return;
     }
 
+    if (!selectedDate) {
+      toast.error("Bitte waehlen Sie ein Datum aus.");
+      return;
+    }
+
+    if (!selectedTime) {
+      toast.error("Bitte waehlen Sie eine Uhrzeit aus.");
+      return;
+    }
+
+    if (unavailableSlots.includes(selectedTime)) {
+      toast.error("Dieser Termin ist inzwischen nicht mehr verfuegbar.");
+      return;
+    }
+
+    const scheduledAt = createLocalDateTime(selectedDate, selectedTime);
+
+    if (Number.isNaN(scheduledAt.getTime())) {
+      toast.error("Der gewaehlte Termin ist ungueltig.");
+      return;
+    }
+
+    const payload = {
+      treatment: treatment.trim(),
+      doctor: doctor.trim(),
+      message: message.trim() || undefined,
+      scheduledAt: scheduledAt.toISOString(),
+    };
+
     setSubmitting(true);
 
     try {
-      await createAppointment({
-        treatment: treatment.trim(),
-        doctor: doctor.trim(),
-        message: message.trim() || undefined,
-      });
+      await createAppointment(payload);
 
       toast.success("Ihre Terminanfrage wurde gespeichert.");
       onClose();
     } catch (error) {
+      if (error instanceof AppointmentApiError && error.status === 401) {
+        setPendingPayload(payload);
+        setAuthMode("register");
+        setAuthOpen(true);
+        toast.info("Bitte registrieren Sie sich, um den Termin abzuschließen.");
+        return;
+      }
+
       const message =
         error instanceof Error
           ? error.message
@@ -184,6 +283,61 @@ export default function AppointmentRequestModal({
             </p>
           </div>
 
+          <div className="grid gap-4 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Wunschdatum
+              </label>
+              <input
+                type="date"
+                value={selectedDate}
+                min={getTodayDateValue()}
+                onChange={(event) => setSelectedDate(event.target.value)}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-emerald-600"
+              />
+              <p className="text-xs text-slate-500">
+                Bitte waehlen Sie den Tag, an dem Sie den Termin bevorzugen.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Uhrzeit
+              </label>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                {APPOINTMENT_TIME_SLOTS.map((slot) => {
+                  const selected = slot === selectedTime;
+                  const unavailable = unavailableSlots.includes(slot);
+
+                  return (
+                    <button
+                      key={slot}
+                      type="button"
+                      disabled={unavailable || loadingSlots}
+                      onClick={() => setSelectedTime(slot)}
+                      className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                        unavailable
+                          ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
+                          : selected
+                          ? "border-emerald-600 bg-emerald-600 text-white"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-emerald-300 hover:bg-emerald-50"
+                      }`}
+                    >
+                      {slot}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-slate-500">
+                Jeder Slot entspricht 30 Minuten. Die finale Bestaetigung
+                erfolgt durch unser Team.
+              </p>
+              {loadingSlots ? (
+                <p className="text-xs text-slate-500">Verfuegbare Zeiten werden geladen...</p>
+              ) : null}
+            </div>
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700">
               Nachricht
@@ -206,6 +360,43 @@ export default function AppointmentRequestModal({
           </button>
         </form>
       </div>
+
+      <AuthModal
+        isOpen={authOpen}
+        mode={authMode}
+        onClose={() => {
+          if (submitting) return;
+          setAuthOpen(false);
+        }}
+        onSwitchMode={setAuthMode}
+        onAuthSuccess={async () => {
+          if (!pendingPayload) {
+            setAuthOpen(false);
+            router.refresh();
+            return;
+          }
+
+          setSubmitting(true);
+
+          try {
+            await getCurrentUser();
+            await createAppointment(pendingPayload);
+            toast.success("Ihre Terminanfrage wurde gespeichert.");
+            setPendingPayload(null);
+            setAuthOpen(false);
+            router.refresh();
+            onClose();
+          } catch (error) {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Terminanfrage konnte nicht gespeichert werden.";
+            toast.error(message);
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      />
     </div>
   );
 }

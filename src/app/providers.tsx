@@ -9,7 +9,7 @@ import { AppProvider } from "../context/AppProvider";
 import { ErrorBoundary } from "../components/common/ErrorBoundary";
 import { Header } from "../layout/Header";
 import { Footer } from "../layout/Footer";
-import { contactNavItem, legalNavItems, navigationItems, siteBrand } from "../config/site";
+import { legalNavItems, navigationItems, siteBrand } from "../config/site";
 import type { UserRole } from "../types/user";
 
 export function Providers({
@@ -31,7 +31,6 @@ export function Providers({
           <Header
             brand={siteBrand}
             navItems={navigationItems}
-            contactItem={contactNavItem}
             initialUser={initialUser}
           />
           <Box component="main">{children}</Box>

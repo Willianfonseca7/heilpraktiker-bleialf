@@ -53,6 +53,7 @@ export type Appointment = {
   doctor: string | null;
   message: string | null;
   status: AppointmentStatus;
+  scheduledAt: string | null;
   createdAt: string;
   updatedAt?: string;
 };
@@ -61,6 +62,7 @@ export type CreateAppointmentPayload = {
   treatment: string;
   doctor?: string;
   message?: string;
+  scheduledAt?: string;
 };
 
 export type AdminAppointment = Appointment & {

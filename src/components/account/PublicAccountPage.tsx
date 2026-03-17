@@ -24,6 +24,13 @@ const appointmentStatusLabels: Record<Appointment["status"], string> = {
   CANCELED: "Abgelehnt",
 };
 
+function formatAppointmentDateTime(value: string) {
+  return new Date(value).toLocaleString("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
 export default function PublicAccountPage() {
   const router = useRouter();
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -257,6 +264,13 @@ export default function PublicAccountPage() {
                       Anfrage vom{" "}
                       {new Date(appointment.createdAt).toLocaleDateString("de-DE")}
                     </p>
+
+                    {appointment.scheduledAt ? (
+                      <p className="mt-2 text-sm font-medium text-slate-700">
+                        Gewaehlter Termin:{" "}
+                        {formatAppointmentDateTime(appointment.scheduledAt)}
+                      </p>
+                    ) : null}
 
                     {appointment.doctor ? (
                       <p className="mt-3 text-sm text-slate-700">

@@ -100,7 +100,7 @@ export default function ResultSummaryCard({
               onClick={() => setAppointmentOpen(true)}
               className="inline-flex rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-emerald-700"
             >
-              Termin anfragen
+              Termin online buchen
             </button>
           </div>
           <ul className="mt-4 space-y-3">

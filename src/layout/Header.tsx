@@ -30,14 +30,12 @@ type Brand = {
 type HeaderProps = {
   brand: Brand;
   navItems: NavItem[];
-  contactItem: NavItem;
   initialUser: AdminNavbarUser | null;
 };
 
 export function Header({
   brand,
   navItems,
-  contactItem,
   initialUser,
 }: HeaderProps) {
   const pathname = usePathname();
@@ -380,30 +378,26 @@ export function Header({
                 ))}
                 {role ? (
                   <>
-                    <Box
+                    <Button
                       component={Link}
                       href="/mein-konto"
                       sx={{
-                        minWidth: 38,
-                        width: 40,
-                        height: 40,
-                        borderRadius: "50%",
-                        bgcolor: "#ffffff",
-                        border: "1px solid rgba(16, 185, 129, 0.18)",
-                        display: "grid",
-                        placeItems: "center",
-                        fontWeight: 800,
-                        letterSpacing: 0.4,
+                        borderRadius: 999,
+                        px: 2.5,
+                        fontWeight: 700,
+                        textTransform: "none",
                         color: "#047857",
-                        textDecoration: "none",
+                        borderColor: "rgba(16, 185, 129, 0.22)",
+                        bgcolor: "rgba(255,255,255,0.78)",
                         boxShadow: "0 4px 14px rgba(15, 23, 42, 0.05)",
                         "&:hover": {
-                          bgcolor: "#f7fffb",
+                          borderColor: "rgba(16, 185, 129, 0.34)",
+                          bgcolor: "rgba(16, 185, 129, 0.08)",
                         },
                       }}
                     >
-                      {userInitials || "US"}
-                    </Box>
+                      Mein Konto
+                    </Button>
                     <Button
                       onClick={handleLogout}
                       variant="outlined"
@@ -446,11 +440,10 @@ export function Header({
                         },
                       }}
                     >
-                      Anmelden/Registrieren
+                      Login
                     </Button>
                     <Button
-                      component={Link}
-                      href={contactItem.path}
+                      onClick={openRegister}
                       variant="outlined"
                       color="inherit"
                       sx={{
@@ -468,7 +461,7 @@ export function Header({
                         },
                       }}
                     >
-                      {contactItem.label}
+                      Registrieren
                     </Button>
                   </>
                 )}

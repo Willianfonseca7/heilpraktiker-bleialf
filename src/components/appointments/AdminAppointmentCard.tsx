@@ -20,6 +20,13 @@ const statusClasses: Record<AppointmentStatus, string> = {
   CANCELED: "bg-rose-50 text-rose-700",
 };
 
+function formatAppointmentDateTime(value: string) {
+  return new Date(value).toLocaleString("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
 export default function AdminAppointmentCard({
   appointment,
   updating,
@@ -59,6 +66,14 @@ export default function AdminAppointmentCard({
         <div>
           <dt className="font-medium text-slate-900">Status</dt>
           <dd className="mt-1">{statusLabels[appointment.status]}</dd>
+        </div>
+        <div>
+          <dt className="font-medium text-slate-900">Gewaehlter Termin</dt>
+          <dd className="mt-1">
+            {appointment.scheduledAt
+              ? formatAppointmentDateTime(appointment.scheduledAt)
+              : "Noch nicht festgelegt"}
+          </dd>
         </div>
       </dl>
 

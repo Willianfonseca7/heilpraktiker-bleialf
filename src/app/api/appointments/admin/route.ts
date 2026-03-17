@@ -30,6 +30,7 @@ export async function GET() {
       doctor: appointment.doctor,
       message: appointment.message,
       status: appointment.status,
+      scheduledAt: appointment.scheduledAt?.toISOString() ?? null,
       createdAt: appointment.createdAt.toISOString(),
       updatedAt: appointment.updatedAt.toISOString(),
       user: appointment.user,
