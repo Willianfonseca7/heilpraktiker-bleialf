@@ -1,14 +1,14 @@
 import { Box, Typography } from "@mui/material";
 import LocalFloristOutlinedIcon from "@mui/icons-material/LocalFloristOutlined";
 import Link from "next/link";
-import { HeroSlider } from "./components/HeroSlider";
+import IrisAnimation from "./components/IrisAnimation";
 import { PageContainer } from "../../components/ui/PageContainer";
 import { Section } from "../../components/ui/Section";
 import { FeatureCard } from "../../components/ui/FeatureCard";
 import { SecondaryCTAButton } from "../../components/ui/Buttons";
 import AppointmentPrimaryCTAButton from "@/components/appointments/AppointmentPrimaryCTAButton";
 import VNSSection from "@/components/home/VNSSection";
-import { homeFeatureCards, homeHeroSlides } from "../../config/homeContent";
+import { homeFeatureCards } from "../../config/homeContent";
 
 const heroGridSx = {
   display: "grid",
@@ -97,7 +97,7 @@ export function Home() {
             </Box>
           </Box>
 
-          <HeroSlider slides={homeHeroSlides} />
+          <IrisAnimation />
         </Box>
 
         <Box id="health-check" sx={objectiveWrapperSx}>

@@ -12,27 +12,13 @@ import {
   markAppointmentUpdatesAsSeen,
 } from "@/lib/appointments-api";
 import { getOwnHealthCheckResults } from "@/lib/health-check-api";
+import {
+  appointmentStatusClasses,
+  appointmentStatusLabels,
+} from "@/lib/appointment-status";
+import { formatAppointmentDateTime } from "@/lib/date-format";
 import type { PersistedHealthCheckResult } from "@/features/health-check/types";
 import type { Appointment, CurrentUser } from "@/types/user";
-
-const appointmentStatusClasses: Record<Appointment["status"], string> = {
-  PENDING: "bg-amber-50 text-amber-700",
-  CONFIRMED: "bg-emerald-50 text-emerald-700",
-  CANCELED: "bg-rose-50 text-rose-700",
-};
-
-const appointmentStatusLabels: Record<Appointment["status"], string> = {
-  PENDING: "Offen",
-  CONFIRMED: "Akzeptiert",
-  CANCELED: "Abgelehnt",
-};
-
-function formatAppointmentDateTime(value: string) {
-  return new Date(value).toLocaleString("de-DE", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
 
 export default function PublicAccountPage() {
   const router = useRouter();

@@ -4,6 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { AdminAppointment, AppointmentStatus } from "@/types/user";
 import {
+  appointmentFilterLabels as filterLabels,
+  appointmentFilterOrder as filterOrder,
+} from "@/lib/appointment-status";
+import {
   getAdminAppointments,
   updateAppointmentStatus,
 } from "@/lib/admin-appointments-api";
@@ -11,20 +15,6 @@ import AdminAppointmentCard from "@/components/appointments/AdminAppointmentCard
 
 type AppointmentFilter = "ALL" | AppointmentStatus;
 type AppointmentSortOrder = "DESC" | "ASC";
-
-const filterLabels: Record<AppointmentFilter, string> = {
-  ALL: "Alle",
-  PENDING: "Offen",
-  CONFIRMED: "Akzeptiert",
-  CANCELED: "Abgelehnt",
-};
-
-const filterOrder: AppointmentFilter[] = [
-  "PENDING",
-  "ALL",
-  "CONFIRMED",
-  "CANCELED",
-];
 
 export default function AdminAppointmentsSection() {
   const INITIAL_VISIBLE_COUNT = 3;

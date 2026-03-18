@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  appointmentStatusClasses as statusClasses,
+  appointmentStatusLabels as statusLabels,
+} from "@/lib/appointment-status";
+import { formatAppointmentDateTime } from "@/lib/date-format";
 import type { AdminAppointment, AppointmentStatus } from "@/types/user";
 
 type AdminAppointmentCardProps = {
@@ -7,25 +12,6 @@ type AdminAppointmentCardProps = {
   updating: boolean;
   onStatusChange: (id: string, status: AppointmentStatus) => void;
 };
-
-const statusLabels: Record<AppointmentStatus, string> = {
-  PENDING: "Offen",
-  CONFIRMED: "Akzeptiert",
-  CANCELED: "Abgelehnt",
-};
-
-const statusClasses: Record<AppointmentStatus, string> = {
-  PENDING: "bg-amber-50 text-amber-700",
-  CONFIRMED: "bg-emerald-50 text-emerald-700",
-  CANCELED: "bg-rose-50 text-rose-700",
-};
-
-function formatAppointmentDateTime(value: string) {
-  return new Date(value).toLocaleString("de-DE", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
 
 export default function AdminAppointmentCard({
   appointment,

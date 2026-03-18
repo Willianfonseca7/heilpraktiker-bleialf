@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import PatientDetail from "@/components/ui/patient-detail";
 import type { PersistedHealthCheckResult } from "@/features/health-check/types";
+import type { ContactMessage } from "@/types/contact";
 import type { Appointment } from "@/types/user";
 
 export const dynamic = "force-dynamic";
@@ -12,16 +13,6 @@ type Patient = {
   email: string | null;
   phone: string | null;
   createdAt: string | Date;
-};
-
-type ContactMessage = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string | null;
-  message: string;
-  createdAt: string;
 };
 
 type PatientDetailPayload = {

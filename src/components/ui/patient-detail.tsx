@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { PersistedHealthCheckResult } from "@/features/health-check/types";
+import {
+  appointmentStatusClasses,
+  appointmentStatusLabels,
+} from "@/lib/appointment-status";
+import { formatDateTime } from "@/lib/date-format";
+import type { ContactMessage } from "@/types/contact";
 import type { Appointment } from "@/types/user";
 
 type Patient = {
@@ -15,16 +21,6 @@ type Patient = {
   createdAt: string | Date;
 };
 
-type ContactMessage = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string | null;
-  message: string;
-  createdAt: string;
-};
-
 type PatientDetailData = {
   patient: Patient;
   appointments: Appointment[];
@@ -34,33 +30,6 @@ type PatientDetailData = {
 
 type PatientDetailProps = {
   initialData: PatientDetailData;
-};
-
-function toDate(value: string | Date) {
-  return value instanceof Date ? value : new Date(value);
-}
-
-function formatDateTime(value: string | Date) {
-  const d = toDate(value);
-  return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
-}
-
-const appointmentStatusLabels: Record<Appointment["status"], string> = {
-  PENDING: "Offen",
-  CONFIRMED: "Akzeptiert",
-  CANCELED: "Abgelehnt",
-};
-
-const appointmentStatusClasses: Record<Appointment["status"], string> = {
-  PENDING: "bg-amber-50 text-amber-700",
-  CONFIRMED: "bg-emerald-50 text-emerald-700",
-  CANCELED: "bg-rose-50 text-rose-700",
 };
 
 const healthLevelLabels: Record<PersistedHealthCheckResult["level"], string> = {

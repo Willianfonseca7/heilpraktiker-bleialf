@@ -8,6 +8,7 @@ import AdminContactMessagesSection from "@/components/kontakt/AdminContactMessag
 import Modal from "@/components/Modal";
 import PatientForm from "@/components/PatientForm";
 import { toast } from "sonner";
+import { formatDateTime, toDate } from "@/lib/date-format";
 import type { ContactMessage } from "@/types/contact";
 
 type Patient = {
@@ -28,22 +29,6 @@ type PatientsDashboardProps = {
   total: number;
   contactMessages: ContactMessage[];
 };
-
-function toDate(value: string | Date) {
-  return value instanceof Date ? value : new Date(value);
-}
-
-function formatDateTime(value: string | Date) {
-  const d = toDate(value);
-  // Formato parecido com o seu print: 04.03.2026, 23:35
-  return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
-}
 
 function isSameDay(a: Date, b: Date) {
   return (

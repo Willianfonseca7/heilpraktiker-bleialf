@@ -2,17 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { formatDateTime } from "@/lib/date-format";
 import type { ContactMessage } from "@/types/contact";
-
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
-}
 
 type AdminContactMessagesSectionProps = {
   messages: ContactMessage[];
