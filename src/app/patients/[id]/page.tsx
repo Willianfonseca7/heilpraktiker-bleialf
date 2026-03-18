@@ -1,5 +1,7 @@
 import { headers } from "next/headers";
 import PatientDetail from "@/components/ui/patient-detail";
+import type { PersistedHealthCheckResult } from "@/features/health-check/types";
+import type { Appointment } from "@/types/user";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +14,24 @@ type Patient = {
   createdAt: string | Date;
 };
 
-async function getPatient(id: string): Promise<Patient> {
+type ContactMessage = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  message: string;
+  createdAt: string;
+};
+
+type PatientDetailPayload = {
+  patient: Patient;
+  appointments: Appointment[];
+  healthChecks: PersistedHealthCheckResult[];
+  contactMessages: ContactMessage[];
+};
+
+async function getPatient(id: string): Promise<PatientDetailPayload> {
   const h = await headers();
   const host = h.get("host");
   const cookie = h.get("cookie") ?? "";
@@ -37,7 +56,7 @@ export default async function PatientDetailPage({
 }: {
   params: { id: string };
 }) {
-  const p = await getPatient(params.id);
+  const detail = await getPatient(params.id);
 
-  return <PatientDetail initialPatient={p} />;
+  return <PatientDetail initialData={detail} />;
 }

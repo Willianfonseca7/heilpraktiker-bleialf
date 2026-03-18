@@ -33,10 +33,10 @@ export default function AdminAppointmentCard({
   onStatusChange,
 }: AdminAppointmentCardProps) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-emerald-100 hover:shadow-md md:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">
+          <h3 className="text-lg font-semibold leading-tight text-slate-900">
             {appointment.user.firstName} {appointment.user.lastName}
           </h3>
           <p className="mt-1 text-sm text-slate-500">{appointment.user.email}</p>
@@ -48,27 +48,27 @@ export default function AdminAppointmentCard({
         </span>
       </div>
 
-      <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+      <dl className="mt-4 grid gap-x-6 gap-y-3 text-sm text-slate-600 sm:grid-cols-2 xl:grid-cols-4">
         <div>
-          <dt className="font-medium text-slate-900">Behandlung</dt>
-          <dd className="mt-1">{appointment.treatment}</dd>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Behandlung</dt>
+          <dd className="mt-1 font-medium text-slate-800">{appointment.treatment}</dd>
         </div>
         <div>
-          <dt className="font-medium text-slate-900">Behandler</dt>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Behandler</dt>
           <dd className="mt-1">{appointment.doctor ?? "Automatisch zuweisen"}</dd>
         </div>
         <div>
-          <dt className="font-medium text-slate-900">Anfrage vom</dt>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Anfrage vom</dt>
           <dd className="mt-1">
-            {new Date(appointment.createdAt).toLocaleDateString("de-DE")}
+            {formatAppointmentDateTime(appointment.createdAt)}
           </dd>
         </div>
         <div>
-          <dt className="font-medium text-slate-900">Status</dt>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</dt>
           <dd className="mt-1">{statusLabels[appointment.status]}</dd>
         </div>
         <div>
-          <dt className="font-medium text-slate-900">Gewaehlter Termin</dt>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Gewaehlter Termin</dt>
           <dd className="mt-1">
             {appointment.scheduledAt
               ? formatAppointmentDateTime(appointment.scheduledAt)
@@ -78,13 +78,16 @@ export default function AdminAppointmentCard({
       </dl>
 
       {appointment.message ? (
-        <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
           {appointment.message}
         </div>
       ) : null}
 
       {appointment.status === "PENDING" ? (
-        <div className="mt-4 flex flex-wrap gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+            Aktion erforderlich
+          </span>
           <button
             type="button"
             disabled={updating}

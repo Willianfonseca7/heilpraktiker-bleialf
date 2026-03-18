@@ -106,6 +106,20 @@ export default function PatientsDashboard({
       .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime())[0];
   }, [items]);
 
+  const totalContactMessages = useMemo(
+    () => contactMessages.length,
+    [contactMessages.length]
+  );
+
+  const latestContactMessage = useMemo(() => {
+    if (!contactMessages.length) return null;
+
+    return [...contactMessages].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )[0];
+  }, [contactMessages]);
+
   // Create handler (persist in backend)
   const handleCreatePatient = async (values: {
   name: string;
@@ -168,7 +182,7 @@ export default function PatientsDashboard({
       </div>
 
       {/* KPI cards */}
-      <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Gesamtanzahl der Patienten</p>
           <p className="mt-2 text-3xl font-semibold text-gray-900">{totalPatients}</p>
@@ -187,6 +201,27 @@ export default function PatientsDashboard({
                 {lastRegistered.firstName} {lastRegistered.lastName}
               </p>
               <p className="mt-1 text-sm text-gray-500">{formatDateTime(lastRegistered.createdAt)}</p>
+            </>
+          ) : (
+            <p className="mt-2 text-sm text-gray-500">—</p>
+          )}
+        </div>
+
+        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Kontaktanfragen gesamt</p>
+          <p className="mt-2 text-3xl font-semibold text-gray-900">{totalContactMessages}</p>
+        </div>
+
+        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">Letzte Kontaktanfrage</p>
+          {latestContactMessage ? (
+            <>
+              <p className="mt-2 text-base font-semibold text-gray-900">
+                {latestContactMessage.firstName} {latestContactMessage.lastName}
+              </p>
+              <p className="mt-1 text-sm text-gray-500">
+                {formatDateTime(latestContactMessage.createdAt)}
+              </p>
             </>
           ) : (
             <p className="mt-2 text-sm text-gray-500">—</p>

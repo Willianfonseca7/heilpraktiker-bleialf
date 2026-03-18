@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import type { PersistedHealthCheckResult } from "@/features/health-check/types";
+import type { Appointment } from "@/types/user";
 
 type Patient = {
   id: string;
@@ -13,8 +15,25 @@ type Patient = {
   createdAt: string | Date;
 };
 
+type ContactMessage = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  message: string;
+  createdAt: string;
+};
+
+type PatientDetailData = {
+  patient: Patient;
+  appointments: Appointment[];
+  healthChecks: PersistedHealthCheckResult[];
+  contactMessages: ContactMessage[];
+};
+
 type PatientDetailProps = {
-  initialPatient: Patient;
+  initialData: PatientDetailData;
 };
 
 function toDate(value: string | Date) {
@@ -32,19 +51,54 @@ function formatDateTime(value: string | Date) {
   }).format(d);
 }
 
-export default function PatientDetail({ initialPatient }: PatientDetailProps) {
+const appointmentStatusLabels: Record<Appointment["status"], string> = {
+  PENDING: "Offen",
+  CONFIRMED: "Akzeptiert",
+  CANCELED: "Abgelehnt",
+};
+
+const appointmentStatusClasses: Record<Appointment["status"], string> = {
+  PENDING: "bg-amber-50 text-amber-700",
+  CONFIRMED: "bg-emerald-50 text-emerald-700",
+  CANCELED: "bg-rose-50 text-rose-700",
+};
+
+const healthLevelLabels: Record<PersistedHealthCheckResult["level"], string> = {
+  low: "Niedrig",
+  medium: "Mittel",
+  high: "Erhoeht",
+};
+
+export default function PatientDetail({ initialData }: PatientDetailProps) {
+  const INITIAL_SECTION_LIMIT = 3;
+  const LOAD_MORE_STEP = 3;
   const router = useRouter();
-  const [patient, setPatient] = useState<Patient>(initialPatient);
+  const [patient, setPatient] = useState<Patient>(initialData.patient);
+  const [visibleAppointmentsCount, setVisibleAppointmentsCount] = useState(
+    INITIAL_SECTION_LIMIT
+  );
+  const [visibleHealthChecksCount, setVisibleHealthChecksCount] = useState(
+    INITIAL_SECTION_LIMIT
+  );
+  const [visibleContactMessagesCount, setVisibleContactMessagesCount] = useState(
+    INITIAL_SECTION_LIMIT
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
-    firstName: initialPatient.firstName,
-    lastName: initialPatient.lastName,
-    email: initialPatient.email ?? "",
-    phone: initialPatient.phone ?? "",
+    firstName: initialData.patient.firstName,
+    lastName: initialData.patient.lastName,
+    email: initialData.patient.email ?? "",
+    phone: initialData.patient.phone ?? "",
   });
+
+  useEffect(() => {
+    setVisibleAppointmentsCount(INITIAL_SECTION_LIMIT);
+    setVisibleHealthChecksCount(INITIAL_SECTION_LIMIT);
+    setVisibleContactMessagesCount(INITIAL_SECTION_LIMIT);
+  }, [initialData]);
 
   const onChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -132,10 +186,10 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-10">
-      <div className="flex items-start justify-between gap-6">
+    <div className="mx-auto max-w-6xl p-6 md:p-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
         <div>
-          <h1 className="text-3xl font-semibold">
+          <h1 className="text-3xl font-semibold tracking-tight">
             {patient.firstName} {patient.lastName}
           </h1>
           <p className="text-sm text-black/60 mt-1">
@@ -143,11 +197,11 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="px-4 py-2 rounded-lg border hover:bg-black/5"
+              className="rounded-xl border px-4 py-2 text-sm hover:bg-black/5"
             >
               Bearbeiten
             </button>
@@ -155,7 +209,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
+              className="rounded-xl bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:opacity-60"
             >
               {isSaving ? "Speichern..." : "Speichern"}
             </button>
@@ -163,7 +217,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
           <button
             onClick={handleDelete}
             disabled={isSaving}
-            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+            className="rounded-xl bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-60"
           >
             Löschen
           </button>
@@ -176,8 +230,8 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
         </div>
       ) : null}
 
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border bg-white p-5">
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border bg-white p-4">
           <div className="text-xs uppercase tracking-wide text-black/50">
             E-Mail
           </div>
@@ -193,7 +247,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
           )}
         </div>
 
-        <div className="rounded-xl border bg-white p-5">
+        <div className="rounded-2xl border bg-white p-4">
           <div className="text-xs uppercase tracking-wide text-black/50">
             Telefon
           </div>
@@ -210,8 +264,8 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border bg-white p-5">
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border bg-white p-4">
           <div className="text-xs uppercase tracking-wide text-black/50">
             Vorname
           </div>
@@ -226,7 +280,7 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
           )}
         </div>
 
-        <div className="rounded-xl border bg-white p-5">
+        <div className="rounded-2xl border bg-white p-4">
           <div className="text-xs uppercase tracking-wide text-black/50">
             Nachname
           </div>
@@ -260,6 +314,241 @@ export default function PatientDetail({ initialPatient }: PatientDetailProps) {
           </button>
         </div>
       ) : null}
+
+      <div className="mt-8 space-y-6">
+        <section>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">Terminanfragen</h2>
+              <p className="mt-1 text-sm text-black/55">
+                Alle Termininteraktionen dieses Patienten.
+              </p>
+            </div>
+            <span className="rounded-full bg-black/5 px-3 py-1 text-sm text-black/60">
+              {initialData.appointments.length} Eintraege
+            </span>
+          </div>
+
+          {initialData.appointments.length === 0 ? (
+            <div className="mt-4 rounded-2xl border bg-white px-5 py-4 text-sm text-black/60">
+              Keine Terminanfragen vorhanden.
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {initialData.appointments
+                .slice(0, visibleAppointmentsCount)
+                .map((appointment) => (
+                <article
+                  key={appointment.id}
+                  className="rounded-2xl border bg-white p-4"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-semibold">
+                        {appointment.treatment}
+                      </h3>
+                      <p className="mt-1 text-sm text-black/55">
+                        Anfrage vom {formatDateTime(appointment.createdAt)}
+                      </p>
+                    </div>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${appointmentStatusClasses[appointment.status]}`}
+                    >
+                      {appointmentStatusLabels[appointment.status]}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 grid gap-3 text-sm sm:grid-cols-2 xl:grid-cols-3">
+                    <div>
+                      <div className="text-xs uppercase tracking-wide text-black/45">
+                        Behandler
+                      </div>
+                      <div className="mt-1">{appointment.doctor ?? "Automatisch zuweisen"}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs uppercase tracking-wide text-black/45">
+                        Gewaehlter Termin
+                      </div>
+                      <div className="mt-1">
+                        {appointment.scheduledAt
+                          ? formatDateTime(appointment.scheduledAt)
+                          : "Noch nicht festgelegt"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs uppercase tracking-wide text-black/45">
+                        Letzte Aktualisierung
+                      </div>
+                      <div className="mt-1">{formatDateTime(appointment.updatedAt ?? appointment.createdAt)}</div>
+                    </div>
+                  </div>
+
+                  {appointment.message ? (
+                    <div className="mt-3 rounded-xl bg-black/[0.03] px-4 py-3 text-sm text-black/70">
+                      {appointment.message}
+                    </div>
+                  ) : null}
+                </article>
+              ))}
+              {initialData.appointments.length > visibleAppointmentsCount ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVisibleAppointmentsCount((current) => current + LOAD_MORE_STEP)
+                  }
+                  className="rounded-xl border bg-white px-4 py-2 text-sm font-medium hover:bg-black/5"
+                >
+                  Mehr laden ({Math.min(
+                    LOAD_MORE_STEP,
+                    initialData.appointments.length - visibleAppointmentsCount
+                  )})
+                </button>
+              ) : null}
+            </div>
+          )}
+        </section>
+
+        <section>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">Gesundheits-Checks</h2>
+              <p className="mt-1 text-sm text-black/55">
+                Bisher gespeicherte Auswertungen dieses Patienten.
+              </p>
+            </div>
+            <span className="rounded-full bg-black/5 px-3 py-1 text-sm text-black/60">
+              {initialData.healthChecks.length} Eintraege
+            </span>
+          </div>
+
+          {initialData.healthChecks.length === 0 ? (
+            <div className="mt-4 rounded-2xl border bg-white px-5 py-4 text-sm text-black/60">
+              Keine Gesundheits-Checks vorhanden.
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {initialData.healthChecks
+                .slice(0, visibleHealthChecksCount)
+                .map((result) => (
+                <article key={result.id} className="rounded-2xl border bg-white p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-semibold">
+                        Check vom {formatDateTime(result.createdAt)}
+                      </h3>
+                      <p className="mt-1 text-sm text-black/55">
+                        Score: {result.totalScore}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                      {healthLevelLabels[result.level]}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-black/70">
+                    {result.summary}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {result.recommendations.map((item) => (
+                      <span
+                        key={`${result.id}-${item}`}
+                        className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </article>
+              ))}
+              {initialData.healthChecks.length > visibleHealthChecksCount ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVisibleHealthChecksCount((current) => current + LOAD_MORE_STEP)
+                  }
+                  className="rounded-xl border bg-white px-4 py-2 text-sm font-medium hover:bg-black/5"
+                >
+                  Mehr laden ({Math.min(
+                    LOAD_MORE_STEP,
+                    initialData.healthChecks.length - visibleHealthChecksCount
+                  )})
+                </button>
+              ) : null}
+            </div>
+          )}
+        </section>
+
+        <section>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">Nachrichten</h2>
+              <p className="mt-1 text-sm text-black/55">
+                Kontaktanfragen dieses Patienten ueber das oeffentliche Formular.
+              </p>
+            </div>
+            <span className="rounded-full bg-black/5 px-3 py-1 text-sm text-black/60">
+              {initialData.contactMessages.length} Eintraege
+            </span>
+          </div>
+
+          {initialData.contactMessages.length === 0 ? (
+            <div className="mt-4 rounded-2xl border bg-white px-5 py-4 text-sm text-black/60">
+              Keine Nachrichten vorhanden.
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {initialData.contactMessages
+                .slice(0, visibleContactMessagesCount)
+                .map((message) => (
+                <article key={message.id} className="rounded-2xl border bg-white p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-semibold">
+                        {message.firstName} {message.lastName}
+                      </h3>
+                      <p className="mt-1 text-sm text-black/55">
+                        {formatDateTime(message.createdAt)}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={`mailto:${message.email}?subject=${encodeURIComponent("Rueckmeldung zu Ihrer Anfrage")}`}
+                        className="rounded-xl border px-3 py-2 text-sm hover:bg-black/5"
+                      >
+                        Per E-Mail antworten
+                      </a>
+                      {message.phone ? (
+                        <a
+                          href={`tel:${message.phone}`}
+                          className="rounded-xl border px-3 py-2 text-sm hover:bg-black/5"
+                        >
+                          Anrufen
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="mt-3 rounded-xl bg-black/[0.03] px-4 py-3 text-sm text-black/70">
+                    {message.message}
+                  </div>
+                </article>
+              ))}
+              {initialData.contactMessages.length > visibleContactMessagesCount ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVisibleContactMessagesCount((current) => current + LOAD_MORE_STEP)
+                  }
+                  className="rounded-xl border bg-white px-4 py-2 text-sm font-medium hover:bg-black/5"
+                >
+                  Mehr laden ({Math.min(
+                    LOAD_MORE_STEP,
+                    initialData.contactMessages.length - visibleContactMessagesCount
+                  )})
+                </button>
+              ) : null}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

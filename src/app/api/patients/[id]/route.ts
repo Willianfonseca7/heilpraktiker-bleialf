@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 import { NextResponse } from "next/server";
+import type { CategoryScores } from "@/features/health-check/types";
 
 type Params = { id: string };
 
@@ -26,7 +27,119 @@ export async function GET(_: Request, { params }: { params: Params }) {
       return NextResponse.json({ error: "not found" }, { status: 404 });
     }
 
-    return NextResponse.json(patient, { headers: { "Cache-Control": "no-store" } });
+    let user:
+      | {
+          id: string;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }
+      | null = null;
+
+    if (patient.email) {
+      user = await prisma.user.findUnique({
+        where: { email: patient.email },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      });
+    }
+
+    const [appointments, healthChecks, contactMessages] = await Promise.all([
+      user
+        ? prisma.appointment.findMany({
+            where: { userId: user.id },
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              treatment: true,
+              doctor: true,
+              message: true,
+              status: true,
+              scheduledAt: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          })
+        : Promise.resolve([]),
+      user
+        ? prisma.healthCheckResult.findMany({
+            where: { userId: user.id },
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              clientResultId: true,
+              totalScore: true,
+              level: true,
+              categoryScores: true,
+              summary: true,
+              recommendations: true,
+              createdAt: true,
+            },
+          })
+        : Promise.resolve([]),
+      patient.email
+        ? prisma.contactMessage.findMany({
+            where: { email: patient.email },
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phone: true,
+              message: true,
+              createdAt: true,
+            },
+          })
+        : Promise.resolve([]),
+    ]);
+
+    return NextResponse.json(
+      {
+        patient: {
+          id: patient.id,
+          firstName: patient.firstName,
+          lastName: patient.lastName,
+          email: patient.email,
+          phone: patient.phone,
+          createdAt: patient.createdAt.toISOString(),
+        },
+        appointments: appointments.map((appointment) => ({
+          id: appointment.id,
+          treatment: appointment.treatment,
+          doctor: appointment.doctor,
+          message: appointment.message,
+          status: appointment.status,
+          scheduledAt: appointment.scheduledAt?.toISOString() ?? null,
+          createdAt: appointment.createdAt.toISOString(),
+          updatedAt: appointment.updatedAt.toISOString(),
+        })),
+        healthChecks: healthChecks.map((result) => ({
+          id: result.id,
+          clientResultId: result.clientResultId,
+          totalScore: result.totalScore,
+          level: result.level.toLowerCase(),
+          categoryScores: result.categoryScores as CategoryScores,
+          summary: result.summary,
+          recommendations: result.recommendations as string[],
+          createdAt: result.createdAt.toISOString(),
+        })),
+        contactMessages: contactMessages.map((message) => ({
+          id: message.id,
+          firstName: message.firstName,
+          lastName: message.lastName,
+          email: message.email,
+          phone: message.phone,
+          message: message.message,
+          createdAt: message.createdAt.toISOString(),
+        })),
+      },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (error) {
     return NextResponse.json({ error: "internal error" }, { status: 500 });
   }

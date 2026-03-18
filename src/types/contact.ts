@@ -5,6 +5,7 @@ export type ContactMessage = {
   email: string;
   phone: string | null;
   message: string;
+  isRead: boolean;
   createdAt: string;
 };
 
@@ -15,4 +16,3 @@ export type CreateContactMessagePayload = {
   phone?: string;
   message: string;
 };
-

@@ -12,6 +12,7 @@ export async function listContactMessages() {
     email: row.email,
     phone: row.phone,
     message: row.message,
+    isRead: row.isRead,
     createdAt: row.createdAt.toISOString(),
   }));
 }
@@ -30,6 +31,7 @@ export async function createContactMessage(input: {
       email: input.email,
       phone: input.phone ?? null,
       message: input.message,
+      isRead: false,
     },
   });
 
@@ -40,7 +42,28 @@ export async function createContactMessage(input: {
     email: row.email,
     phone: row.phone,
     message: row.message,
+    isRead: row.isRead,
     createdAt: row.createdAt.toISOString(),
   };
 }
 
+export async function updateContactMessageReadState(
+  id: string,
+  isRead: boolean
+) {
+  const row = await prisma.contactMessage.update({
+    where: { id },
+    data: { isRead },
+  });
+
+  return {
+    id: row.id,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    email: row.email,
+    phone: row.phone,
+    message: row.message,
+    isRead: row.isRead,
+    createdAt: row.createdAt.toISOString(),
+  };
+}
