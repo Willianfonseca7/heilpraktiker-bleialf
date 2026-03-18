@@ -77,11 +77,6 @@ model Appointment {
   @@index([userId, userHasUnreadStatusUpdate])
 }
 
-model TestTable {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-}
 model Patient {
   id        String   @id @default(uuid())
   firstName String
