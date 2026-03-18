@@ -7,7 +7,10 @@ import UserAccountForm, {
   type UserAccountFormValues,
 } from "@/components/account/UserAccountForm";
 import { getCurrentUser, updateCurrentUser } from "@/lib/account-api";
-import { getOwnAppointments } from "@/lib/appointments-api";
+import {
+  getOwnAppointments,
+  markAppointmentUpdatesAsSeen,
+} from "@/lib/appointments-api";
 import { getOwnHealthCheckResults } from "@/lib/health-check-api";
 import type { PersistedHealthCheckResult } from "@/features/health-check/types";
 import type { Appointment, CurrentUser } from "@/types/user";
@@ -56,6 +59,30 @@ export default function PublicAccountPage() {
         setUser(currentUser);
         setResults(ownResults);
         setAppointments(ownAppointments);
+
+        if (ownAppointments.some((appointment) => appointment.userHasUnreadStatusUpdate)) {
+          markAppointmentUpdatesAsSeen()
+            .then(() => {
+              if (!active) return;
+
+              setAppointments((currentAppointments) =>
+                currentAppointments.map((appointment) => ({
+                  ...appointment,
+                  userHasUnreadStatusUpdate: false,
+                }))
+              );
+              setUser((currentUserState) =>
+                currentUserState
+                  ? {
+                      ...currentUserState,
+                      pendingAppointmentUpdates: 0,
+                    }
+                  : currentUserState
+              );
+              window.dispatchEvent(new CustomEvent("appointment-notifications-cleared"));
+            })
+            .catch(() => undefined);
+        }
       } catch (error) {
         if (!active) return;
         const message =

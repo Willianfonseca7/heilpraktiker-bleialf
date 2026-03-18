@@ -87,7 +87,10 @@ export async function PATCH(
 
   const updated = await prisma.appointment.update({
     where: { id },
-    data: { status },
+    data: {
+      status,
+      userHasUnreadStatusUpdate: status !== AppointmentStatus.PENDING,
+    },
     include: {
       user: {
         select: {
@@ -108,6 +111,7 @@ export async function PATCH(
       message: updated.message,
       status: updated.status,
       scheduledAt: updated.scheduledAt?.toISOString() ?? null,
+      userHasUnreadStatusUpdate: updated.userHasUnreadStatusUpdate,
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString(),
       user: updated.user,

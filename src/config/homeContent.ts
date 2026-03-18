@@ -9,7 +9,7 @@ export const homeHeroSlides: HeroSlide[] = [
 export const homeFeatureCards: FeatureCardItem[] = [
   {
     title: "Iridologie, Homöopathie, Akupunktur",
-    image: "/images/behandlungen/akupunktur.jpg",
+    image: "/images/behandlungen/irisartzt.png",
     items: [
       "Iridologie",
       "Homöopathie",
@@ -37,7 +37,8 @@ export const homeFeatureCards: FeatureCardItem[] = [
   },
   {
     title: "Pädagogik & Lerntherapie",
-    image: "/hero/kindertherapie.jpg",
+    image: "/images/behandlungen/pedagogie.jpg",
+    imageObjectPosition: "center 32%",
     items: [
       "Pädagogin und Lerntherapeutin",
       "Lerntherapeutisches Training",

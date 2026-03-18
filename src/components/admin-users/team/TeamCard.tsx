@@ -1,12 +1,12 @@
-import Image from "next/image"
+import Image from "next/image";
 
 type TeamCardProps = {
-  name: string
-  title: string
-  image: string
-  bio: string
-  specialties: string[]
-}
+  name: string;
+  title: string;
+  image: string;
+  bio: string;
+  specialties: string[];
+};
 
 export default function TeamCard({
   name,
@@ -16,49 +16,30 @@ export default function TeamCard({
   specialties,
 }: TeamCardProps) {
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-lg">
-
-      {/* Image */}
-      <div className="relative h-80 w-full">
-        <Image
-          src={image}
-          alt={name}
-          fill
-          className="object-cover"
-        />
+    <article className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-[0_16px_32px_rgba(15,23,42,0.05)] transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(15,23,42,0.08)]">
+      <div className="relative h-80 w-full bg-emerald-50">
+        <Image src={image} alt={name} fill className="object-cover" />
       </div>
-
-      {/* Content */}
-      
 
       <div className="flex flex-1 flex-col p-6">
+        <h2 className="text-2xl font-semibold text-slate-900">{name}</h2>
+        <p className="mt-1 font-medium text-emerald-700">{title}</p>
 
-          {/* Name */}
-          <h2 className="text-2xl font-semibold text-slate-900">
-            {name}
-          </h2>
+        <p className="mt-4 min-h-[96px] text-sm leading-7 text-slate-600">
+          {bio}
+        </p>
 
-          {/* Title */}
-          <p className="mt-1 font-medium text-emerald-700">
-            {title}
-          </p>
-
-          {/* Bio */}
-          <p className="mt-4 text-sm leading-relaxed text-slate-600 min-h-[72px]">
-            {bio}
-          </p>
-
-          {/* Specialties */}
-          <ul className="mt-4 space-y-2 text-sm text-slate-600">
-            {specialties.map((specialty) => (
-              <li key={specialty} className="flex gap-2">
-                <span className="text-emerald-600">•</span>
-                {specialty}
-              </li>
-            ))}
-          </ul>
-
+        <div className="mt-5 flex flex-wrap gap-2">
+          {specialties.map((specialty) => (
+            <span
+              key={specialty}
+              className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800"
+            >
+              {specialty}
+            </span>
+          ))}
+        </div>
       </div>
     </article>
-  )
-} 
+  );
+}

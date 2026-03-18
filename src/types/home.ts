@@ -4,6 +4,7 @@ export type FeatureCardItem = {
   items: string[];
   href?: string;
   buttonLabel?: string;
+  imageObjectPosition?: string;
 };
 
 export type HeroSlide = {

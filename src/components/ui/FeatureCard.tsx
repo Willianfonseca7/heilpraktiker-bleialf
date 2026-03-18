@@ -7,7 +7,14 @@ import { fallbackImage } from "../../lib/images";
 
 type FeatureCardProps = FeatureCardItem;
 
-export function FeatureCard({ title, image, items, href, buttonLabel }: FeatureCardProps) {
+export function FeatureCard({
+  title,
+  image,
+  items,
+  href,
+  buttonLabel,
+  imageObjectPosition,
+}: FeatureCardProps) {
   const isLink = Boolean(href);
 
   return (
@@ -48,6 +55,7 @@ export function FeatureCard({ title, image, items, href, buttonLabel }: FeatureC
             width: "100%",
             height: "100%",
             objectFit: "cover",
+            objectPosition: imageObjectPosition ?? "center",
             display: "block",
           }}
         />

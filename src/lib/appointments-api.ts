@@ -64,3 +64,15 @@ export async function getUnavailableAppointmentSlots(
   const data = await parseJson<{ unavailableSlots: string[] }>(res);
   return data.unavailableSlots;
 }
+
+export async function markAppointmentUpdatesAsSeen(): Promise<number> {
+  const res = await fetch("/api/appointments/notifications", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await parseJson<{ updatedCount: number }>(res);
+  return data.updatedCount;
+}

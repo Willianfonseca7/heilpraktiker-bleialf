@@ -12,8 +12,8 @@ import { homeFeatureCards, homeHeroSlides } from "../../config/homeContent";
 
 const heroGridSx = {
   display: "grid",
-  gridTemplateColumns: { xs: "1fr", md: "1.1fr 0.9fr" },
-  gap: 4,
+  gridTemplateColumns: { xs: "1fr", lg: "1.1fr 0.9fr" },
+  gap: { xs: 5, md: 6 },
   alignItems: "center",
 } as const;
 
@@ -139,8 +139,8 @@ export function Home() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
-              gap: 3,
+              gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" },
+              gap: { xs: 2.5, md: 3 },
             }}
           >
             {homeFeatureCards.map((card) => (

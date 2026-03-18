@@ -14,6 +14,15 @@ import { requireSession } from "@/lib/session";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+async function countUnreadAppointmentUpdates(userId: string) {
+  return prisma.appointment.count({
+    where: {
+      userId,
+      userHasUnreadStatusUpdate: true,
+    },
+  });
+}
+
 export async function GET() {
   const session = await requireSession();
   if (session instanceof NextResponse) return session;
@@ -36,7 +45,14 @@ export async function GET() {
     return response;
   }
 
-  return NextResponse.json({ user });
+  const pendingAppointmentUpdates = await countUnreadAppointmentUpdates(user.id);
+
+  return NextResponse.json({
+    user: {
+      ...user,
+      pendingAppointmentUpdates,
+    },
+  });
 }
 
 export async function PATCH(req: Request) {
@@ -105,6 +121,8 @@ export async function PATCH(req: Request) {
     },
   });
 
+  const pendingAppointmentUpdates = await countUnreadAppointmentUpdates(updated.id);
+
   const token = await signSession({
     sub: updated.id,
     email: updated.email,
@@ -121,7 +139,12 @@ export async function PATCH(req: Request) {
     data: { sessionExpiresAt },
   });
 
-  const response = NextResponse.json({ user: updated });
+  const response = NextResponse.json({
+    user: {
+      ...updated,
+      pendingAppointmentUpdates,
+    },
+  });
   response.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieOptions(maxAge));
 
   return response;

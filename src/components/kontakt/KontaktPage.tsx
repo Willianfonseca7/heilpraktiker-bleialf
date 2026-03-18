@@ -59,7 +59,8 @@ export default function KontaktPage() {
               gap: 2.5,
               gridTemplateColumns: {
                 xs: "1fr",
-                md: "repeat(3, minmax(0, 1fr))",
+                sm: "repeat(2, minmax(0, 1fr))",
+                lg: "repeat(3, minmax(0, 1fr))",
               },
             }}
           >
@@ -94,7 +95,7 @@ export default function KontaktPage() {
             gap: 3.5,
             gridTemplateColumns: {
               xs: "1fr",
-              md: "minmax(300px,0.95fr) minmax(0,1.35fr)",
+              lg: "minmax(300px,0.95fr) minmax(0,1.35fr)",
             },
             alignItems: "stretch",
           }}

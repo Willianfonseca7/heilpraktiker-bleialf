@@ -2,14 +2,14 @@ import AppointmentSecondaryCTAButton from "@/components/appointments/Appointment
 
 export default function BehandlungenCTA() {
   return (
-    <section className="py-20 bg-gray-100">
-      <div className="max-w-4xl mx-auto px-6 text-center">
+    <section className="bg-gray-100 py-16 md:py-20">
+      <div className="mx-auto max-w-4xl px-6 text-center">
 
-        <h2 className="text-3xl font-semibold mb-4">
+        <h2 className="mb-4 text-3xl font-semibold md:text-4xl">
           Sie sind unsicher, welche Behandlung zu Ihnen passt?
         </h2>
 
-        <p className="text-gray-600 mb-8">
+        <p className="mb-8 text-base leading-7 text-gray-600 md:text-lg">
           Kontaktieren Sie uns – wir beraten Sie gerne persönlich
           und finden gemeinsam den passenden Weg.
         </p>

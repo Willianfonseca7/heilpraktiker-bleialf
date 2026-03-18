@@ -20,6 +20,7 @@ export type CurrentUser = {
   email: string;
   role: UserRole;
   isActive: boolean;
+  pendingAppointmentUpdates?: number;
 };
 
 export type CreateAdminPayload = {
@@ -54,6 +55,7 @@ export type Appointment = {
   message: string | null;
   status: AppointmentStatus;
   scheduledAt: string | null;
+  userHasUnreadStatusUpdate?: boolean;
   createdAt: string;
   updatedAt?: string;
 };
