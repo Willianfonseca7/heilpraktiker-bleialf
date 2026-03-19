@@ -167,7 +167,7 @@ export default function BehandlungenPage() {
         title="Naturheilverfahren"
         intro="Unsere naturheilkundlichen Verfahren ergänzen den ganzheitlichen Blick auf den Menschen und können wertvolle Impulse für Diagnostik, Begleitung und Regulation geben."
         items={naturheilverfahren}
-        imageSrc="/images/behandlungen/naturheilverfahren.png"
+        imageSrc="/images/behandlungen/akupunktur.jpg"
         imageAlt="Naturheilverfahren mit Kräutern und therapeutischen Materialien"
         reverse={false}
         lightBackground={true}
@@ -178,7 +178,7 @@ export default function BehandlungenPage() {
         title="TCM – Traditionelle chinesische Medizin"
         intro="Die Traditionelle chinesische Medizin bietet eine bewährte, ganzheitliche Sichtweise auf Gesundheit und verbindet diagnostische und therapeutische Verfahren zu einem individuellen Behandlungskonzept."
         items={tcm}
-        imageSrc="/images/behandlungen/akupunktur.jpg"
+        imageSrc="/images/behandlungen/naturheilverfahren.png"
         imageAlt="Traditionelle chinesische Medizin mit Akupunktur und Kräutern"
         reverse={true}
       />
