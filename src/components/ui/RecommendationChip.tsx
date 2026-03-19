@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { getRecommendationLearnMoreHref } from "@/lib/recommendation-links";
+import { getRecommendationLearnMoreHref } from "@/lib/treatment-links";
 
 type RecommendationChipProps = {
   recommendation: string;

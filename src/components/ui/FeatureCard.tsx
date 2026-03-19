@@ -4,6 +4,7 @@ import { Box, Button, Typography } from "@mui/material";
 import Link from "next/link";
 import type { FeatureCardItem } from "../../types/home";
 import { fallbackImage } from "../../lib/images";
+import { getTreatmentCardHref } from "@/lib/treatment-links";
 
 type FeatureCardProps = FeatureCardItem;
 
@@ -15,15 +16,9 @@ export function FeatureCard({
   buttonLabel,
   imageObjectPosition,
 }: FeatureCardProps) {
-  const isLink = Boolean(href);
-
   return (
     <Box
-      component={isLink ? Link : "div"}
-      href={isLink ? href : undefined}
       sx={{
-        textDecoration: "none",
-        color: "inherit",
         border: "1px solid",
         borderColor: "rgba(5,150,105,0.12)",
         bgcolor: "background.paper",
@@ -67,14 +62,50 @@ export function FeatureCard({
         <Box component="ul" sx={{ m: 0, pl: 2, color: "text.secondary" }}>
           {items.map((item) => (
             <Box component="li" key={item} sx={{ mb: 0.5 }}>
-              {item}
+              {getTreatmentCardHref(item) ? (
+                <Box
+                  component={Link}
+                  href={getTreatmentCardHref(item) ?? "#"}
+                  sx={{
+                    color: "inherit",
+                    textDecoration: "none",
+                    borderBottom: "1px solid transparent",
+                    transition: "color 180ms ease, border-color 180ms ease",
+                    "&:hover": {
+                      color: "primary.main",
+                      borderColor: "rgba(5,150,105,0.35)",
+                    },
+                  }}
+                >
+                  {item}
+                </Box>
+              ) : (
+                item
+              )}
             </Box>
           ))}
         </Box>
         {buttonLabel && (
-          <Button variant="text" color="primary" sx={{ justifySelf: "start", fontWeight: 700, px: 0 }} component="span">
-            {buttonLabel}
-          </Button>
+          href ? (
+            <Button
+              variant="text"
+              color="primary"
+              sx={{ justifySelf: "start", fontWeight: 700, px: 0 }}
+              component={Link}
+              href={href}
+            >
+              {buttonLabel}
+            </Button>
+          ) : (
+            <Button
+              variant="text"
+              color="primary"
+              sx={{ justifySelf: "start", fontWeight: 700, px: 0 }}
+              component="span"
+            >
+              {buttonLabel}
+            </Button>
+          )
         )}
       </Box>
     </Box>

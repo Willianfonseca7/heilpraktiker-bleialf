@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppointmentCTA from "@/components/appointments/AppointmentCTA";
 import { normalizeClinicTreatment } from "@/data/clinic-offerings";
+import { slugifyTreatment } from "@/lib/treatment-links";
 
 type BehandlungItemProps = {
   title: string;
@@ -13,11 +14,23 @@ export default function BehandlungItem({
   title,
   description,
 }: BehandlungItemProps) {
+  const itemId = slugifyTreatment(title);
   const [open, setOpen] = useState(false);
   const preferredTreatment = normalizeClinicTreatment(title);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (window.location.hash === `#${itemId}`) {
+      setOpen(true);
+    }
+  }, [itemId]);
+
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-emerald-200 hover:shadow-sm">
+    <div
+      id={itemId}
+      className="scroll-mt-28 rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-emerald-200 hover:shadow-sm"
+    >
         <button
           type="button"
           onClick={() => setOpen(!open)}
