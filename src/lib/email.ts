@@ -85,18 +85,18 @@ export async function sendRegistrationEmail(params: {
     text: [
       `Hallo ${fullName},`,
       "",
-      "vielen Dank fuer Ihre Registrierung im Heilpraktiker-Zentrum Bleialf.",
-      "Sie koennen sich ab sofort anmelden, Ihren Gesundheits-Check durchfuehren und Termine online anfragen.",
+      "vielen Dank für Ihre Registrierung im Heilpraktiker-Zentrum Bleialf.",
+      "Sie können sich ab sofort anmelden, Ihren Gesundheits-Check durchführen und Termine online anfragen.",
       "",
-      "Mit freundlichen Gruessen",
+      "Mit freundlichen Grüßen",
       "Heilpraktiker-Zentrum Bleialf",
     ].join("\n"),
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#16352a">
         <h2 style="margin:0 0 16px;color:#065f46">Willkommen, ${safeFirstName}</h2>
-        <p>Vielen Dank fuer Ihre Registrierung im Heilpraktiker-Zentrum Bleialf.</p>
-        <p>Ihr Konto fuer <strong>${safeFullName}</strong> ist jetzt aktiv. Sie koennen sich anmelden, Ihren Gesundheits-Check durchfuehren und Termine online anfragen.</p>
-        <p style="margin-top:24px">Mit freundlichen Gruessen<br />Heilpraktiker-Zentrum Bleialf</p>
+        <p>Vielen Dank für Ihre Registrierung im Heilpraktiker-Zentrum Bleialf.</p>
+        <p>Ihr Konto für <strong>${safeFullName}</strong> ist jetzt aktiv. Sie können sich anmelden, Ihren Gesundheits-Check durchführen und Termine online anfragen.</p>
+        <p style="margin-top:24px">Mit freundlichen Grüßen<br />Heilpraktiker-Zentrum Bleialf</p>
       </div>
     `,
   });
@@ -118,11 +118,11 @@ export async function sendAppointmentStatusEmail(params: {
 
   const accepted = params.status === "CONFIRMED";
   const subject = accepted
-    ? "Ihr Termin wurde bestaetigt"
+    ? "Ihr Termin wurde bestätigt"
     : "Update zu Ihrer Terminanfrage";
 
   const intro = accepted
-    ? "Ihre Terminanfrage wurde bestaetigt."
+    ? "Ihre Terminanfrage wurde bestätigt."
     : "Ihre Terminanfrage wurde leider abgelehnt.";
 
   return sendEmail({
@@ -138,16 +138,14 @@ export async function sendAppointmentStatusEmail(params: {
       "",
       accepted
         ? "Sie finden die Aktualisierung auch in Ihrem Bereich Mein Konto."
-        : "Bitte schauen Sie in Ihrem Bereich Mein Konto fuer weitere Details oder fragen Sie einen neuen Termin an.",
+        : "Bitte schauen Sie in Ihrem Bereich Mein Konto für weitere Details oder fragen Sie einen neuen Termin an.",
       "",
-      "Mit freundlichen Gruessen",
+      "Mit freundlichen Grüßen",
       "Heilpraktiker-Zentrum Bleialf",
     ].join("\n"),
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#16352a">
-        <h2 style="margin:0 0 16px;color:#065f46">${
-          accepted ? "Termin bestaetigt" : "Update zu Ihrer Anfrage"
-        }</h2>
+        <h2 style="margin:0 0 16px;color:#065f46">${accepted ? "Termin bestätigt" : "Update zu Ihrer Anfrage"}</h2>
         <p>Hallo ${safeFirstName},</p>
         <p>${escapeHtml(intro)}</p>
         <div style="margin:20px 0;padding:16px;border:1px solid #d1fae5;border-radius:14px;background:#f0fdf4">
@@ -158,9 +156,9 @@ export async function sendAppointmentStatusEmail(params: {
         <p>${
           accepted
             ? "Sie finden die Aktualisierung auch in Ihrem Bereich <strong>Mein Konto</strong>."
-            : "Bitte schauen Sie in Ihrem Bereich <strong>Mein Konto</strong> fuer weitere Details oder fragen Sie einen neuen Termin an."
+            : "Bitte schauen Sie in Ihrem Bereich <strong>Mein Konto</strong> für weitere Details oder fragen Sie einen neuen Termin an."
         }</p>
-        <p style="margin-top:24px">Mit freundlichen Gruessen<br />Heilpraktiker-Zentrum Bleialf</p>
+        <p style="margin-top:24px">Mit freundlichen Grüßen<br />Heilpraktiker-Zentrum Bleialf</p>
       </div>
     `,
   });
