@@ -17,6 +17,7 @@ import {
   appointmentStatusLabels,
 } from "@/lib/appointment-status";
 import { formatAppointmentDateTime } from "@/lib/date-format";
+import RecommendationChip from "@/components/ui/RecommendationChip";
 import type { PersistedHealthCheckResult } from "@/features/health-check/types";
 import type { Appointment, CurrentUser } from "@/types/user";
 
@@ -227,12 +228,11 @@ export default function PublicAccountPage() {
 
                     <div className="mt-4 flex flex-wrap gap-2">
                       {result.recommendations.map((recommendation) => (
-                        <span
+                        <RecommendationChip
                           key={recommendation}
-                          className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700"
-                        >
-                          {recommendation}
-                        </span>
+                          recommendation={recommendation}
+                          compact
+                        />
                       ))}
                     </div>
                   </article>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppointmentRequestModal from "@/components/appointments/AppointmentRequestModal";
+import RecommendationChip from "@/components/ui/RecommendationChip";
 import type { HealthCheckResult } from "@/features/health-check/types";
 
 type ResultSummaryCardProps = {
@@ -105,11 +106,11 @@ export default function ResultSummaryCard({
           </div>
           <ul className="mt-4 space-y-3">
             {result.recommendations.map((recommendation) => (
-              <li
-                key={recommendation}
-                className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900"
-              >
-                {recommendation}
+              <li key={recommendation}>
+                <RecommendationChip
+                  recommendation={recommendation}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-amber-50 px-4 py-3"
+                />
               </li>
             ))}
           </ul>

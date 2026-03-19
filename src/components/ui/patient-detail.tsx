@@ -9,6 +9,7 @@ import {
   appointmentStatusLabels,
 } from "@/lib/appointment-status";
 import { formatDateTime } from "@/lib/date-format";
+import RecommendationChip from "@/components/ui/RecommendationChip";
 import type { ContactMessage } from "@/types/contact";
 import type { Appointment } from "@/types/user";
 
@@ -418,12 +419,11 @@ export default function PatientDetail({ initialData }: PatientDetailProps) {
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {result.recommendations.map((item) => (
-                      <span
+                      <RecommendationChip
                         key={`${result.id}-${item}`}
-                        className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
-                      >
-                        {item}
-                      </span>
+                        recommendation={item}
+                        compact
+                      />
                     ))}
                   </div>
                 </article>
