@@ -26,7 +26,7 @@ const supportCards = [
     title: "Per E-Mail anfragen",
     text: "Ideal fuer Rueckfragen, Organisatorisches oder wenn Sie uns Ihr Anliegen erst kurz schildern moechten.",
     action: (
-      <SecondaryCTAButton component="a" href="mailto:wfonseca7@hotmail.com">
+      <SecondaryCTAButton component="a" href="mailto:kontakt@praxis-demo.de">
         E-Mail schreiben
       </SecondaryCTAButton>
     ),

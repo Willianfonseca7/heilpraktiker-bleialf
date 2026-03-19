@@ -2,6 +2,7 @@ import { AppointmentStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getDayBounds } from "@/lib/appointment-slots";
+import { sendAppointmentStatusEmail } from "@/lib/email";
 import { requireAdminSession } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -102,6 +103,25 @@ export async function PATCH(
       },
     },
   });
+
+  if (
+    updated.user?.email &&
+    (status === AppointmentStatus.CONFIRMED ||
+      status === AppointmentStatus.CANCELED)
+  ) {
+    try {
+      await sendAppointmentStatusEmail({
+        to: updated.user.email,
+        firstName: updated.user.firstName,
+        treatment: updated.treatment,
+        doctor: updated.doctor,
+        scheduledAt: updated.scheduledAt,
+        status,
+      });
+    } catch (error) {
+      console.error("Failed to send appointment status email", error);
+    }
+  }
 
   return NextResponse.json({
     appointment: {

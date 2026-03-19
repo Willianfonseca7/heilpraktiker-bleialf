@@ -7,13 +7,20 @@ export function formatDateTime(
   options?: Intl.DateTimeFormatOptions
 ) {
   const date = toDate(value);
+  const usesPresetStyles =
+    typeof options?.dateStyle !== "undefined" ||
+    typeof options?.timeStyle !== "undefined";
 
   return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    ...(usesPresetStyles
+      ? {}
+      : {
+          day: "2-digit" as const,
+          month: "2-digit" as const,
+          year: "numeric" as const,
+          hour: "2-digit" as const,
+          minute: "2-digit" as const,
+        }),
     ...options,
   }).format(date);
 }

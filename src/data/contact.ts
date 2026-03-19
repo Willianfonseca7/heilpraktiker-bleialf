@@ -1,5 +1,5 @@
 export const practiceContact = {
-  email: "wfonseca7@hotmail.com",
+  email: "kontakt@praxis-demo.de",
   phoneDisplay: "+49 (0) 6555 123456",
   phoneHref: "+496555123456",
   addressLines: [

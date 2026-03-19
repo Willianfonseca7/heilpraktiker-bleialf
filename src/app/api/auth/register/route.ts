@@ -8,6 +8,7 @@ import {
   signSession,
   SESSION_COOKIE_NAME,
 } from "@/lib/auth";
+import { sendRegistrationEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -78,6 +79,16 @@ export async function POST(req: Request) {
       where: { id: user.id },
       data: { sessionExpiresAt },
     });
+
+    try {
+      await sendRegistrationEmail({
+        to: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
+    } catch (error) {
+      console.error("Failed to send registration email", error);
+    }
 
     const response = NextResponse.json({
       success: true,

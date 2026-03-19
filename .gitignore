@@ -24,3 +24,7 @@ yarn-error.log*
 .DS_Store
 
 /src/generated/prisma
+
+RESEND_API_KEY=re_QEKnyMTN_Ng4tDmgqCDy2pJSzCxwVSqB6
+EMAIL_FROM=Heilpraktiker-Zentrum Bleialf <onboarding@resend.dev>
+
