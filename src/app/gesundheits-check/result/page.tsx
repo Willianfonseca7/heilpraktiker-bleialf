@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { HealthCheckResult } from "@/features/health-check/types";
 import {
@@ -150,6 +151,15 @@ export default function GesundheitsCheckResultPage() {
             Auf Basis Ihrer Antworten wurde eine erste ganzheitliche Einschätzung
             erstellt.
           </p>
+        </div>
+
+        <div className="flex justify-center">
+          <Link
+            href="/"
+            className="inline-flex rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+          >
+            Zur Startseite
+          </Link>
         </div>
 
         {user ? (
