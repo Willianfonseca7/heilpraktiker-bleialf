@@ -46,8 +46,10 @@ export async function GET() {
     },
   });
 
+  type AppointmentRecord = (typeof appointments)[number];
+
   return NextResponse.json({
-    appointments: appointments.map((appointment) => ({
+    appointments: appointments.map((appointment: AppointmentRecord) => ({
       id: appointment.id,
       treatment: appointment.treatment,
       doctor: appointment.doctor,
