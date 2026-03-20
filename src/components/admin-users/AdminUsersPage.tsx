@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { CreateAdminPayload, UpdateUserPayload, User } from "@/types/user";
 import {
@@ -15,6 +15,10 @@ import AdminUsersTable from "./AdminUsersTable";
 import AdminUserModal from "./AdminUserModal";
 import DeleteUserDialog from "./DeleteUserDialog";
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function AdminUsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
@@ -28,7 +32,7 @@ export default function AdminUsersPage() {
 
   const isEdit = Boolean(editingUser);
 
-  const handlePermissionError = (err: unknown) => {
+  const handlePermissionError = useCallback((err: unknown) => {
     if (
       err instanceof AdminUsersApiError &&
       (err.status === 401 || err.status === 403)
@@ -39,28 +43,28 @@ export default function AdminUsersPage() {
     }
 
     return false;
-  };
+  }, [router]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getUsers();
       setUsers(data);
       setFeedback(null);
-    } catch (err: any) {
-      if (handlePermissionError(err)) {
+    } catch (error: unknown) {
+      if (handlePermissionError(error)) {
         return;
       }
-      setFeedback(err?.message ?? "Fehler beim Laden der Admins.");
+      setFeedback(getErrorMessage(error, "Fehler beim Laden der Admins."));
       setUsers([]);
     } finally {
       setLoading(false);
     }
-  }
+  }, [handlePermissionError]);
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    void loadUsers();
+  }, [loadUsers]);
 
   const modalInitial = useMemo(() => {
     if (!editingUser) return null;
@@ -143,11 +147,11 @@ export default function AdminUsersPage() {
         setUsers((prev) => [created, ...prev]);
         setModalOpen(false);
       }
-    } catch (err: any) {
-      if (handlePermissionError(err)) {
+    } catch (error: unknown) {
+      if (handlePermissionError(error)) {
         return;
       }
-      setFeedback(err?.message ?? "Aktion fehlgeschlagen.");
+      setFeedback(getErrorMessage(error, "Aktion fehlgeschlagen."));
     } finally {
       setSubmitting(false);
     }
@@ -161,11 +165,11 @@ export default function AdminUsersPage() {
       await deleteUser(deletingUser.id);
       setUsers((prev) => prev.filter((u) => u.id !== deletingUser.id));
       setDeletingUser(null);
-    } catch (err: any) {
-      if (handlePermissionError(err)) {
+    } catch (error: unknown) {
+      if (handlePermissionError(error)) {
         return;
       }
-      setFeedback(err?.message ?? "Löschen fehlgeschlagen.");
+      setFeedback(getErrorMessage(error, "Löschen fehlgeschlagen."));
     } finally {
       setDeleting(false);
     }

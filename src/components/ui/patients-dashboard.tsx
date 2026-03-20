@@ -45,6 +45,10 @@ function splitName(fullName: string) {
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function PatientsDashboard({
   patients,
   total,
@@ -148,13 +152,11 @@ export default function PatientsDashboard({
 
     toast.success("Patient erfolgreich erstellt", { id: toastId });
 
-  } catch (error: any) {
-
+  } catch (error: unknown) {
     toast.error("Fehler beim Speichern", {
       id: toastId,
-      description: error.message,
+      description: getErrorMessage(error, "Fehler beim Speichern"),
     });
-
   }
 };
 

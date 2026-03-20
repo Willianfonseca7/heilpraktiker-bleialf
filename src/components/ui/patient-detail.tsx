@@ -39,6 +39,10 @@ const healthLevelLabels: Record<PersistedHealthCheckResult["level"], string> = {
   high: "Erhoeht",
 };
 
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export default function PatientDetail({ initialData }: PatientDetailProps) {
   const INITIAL_SECTION_LIMIT = 3;
   const LOAD_MORE_STEP = 3;
@@ -129,8 +133,8 @@ export default function PatientDetail({ initialData }: PatientDetailProps) {
       setIsEditing(false);
       toast.success("Gespeichert");
       router.refresh();
-    } catch (e: any) {
-      setError(e?.message || "Unbekannter Fehler.");
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, "Unbekannter Fehler."));
     } finally {
       setIsSaving(false);
     }
@@ -148,8 +152,8 @@ export default function PatientDetail({ initialData }: PatientDetailProps) {
       }
       toast.success("Patient gelöscht");
       router.push("/patients");
-    } catch (e: any) {
-      setError(e?.message || "Unbekannter Fehler.");
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, "Unbekannter Fehler."));
     } finally {
       setIsSaving(false);
     }
