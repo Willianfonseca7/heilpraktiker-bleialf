@@ -12,14 +12,19 @@ import {
 } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { Role } from "@prisma/client";
 import type { AppRole } from "@/lib/auth";
+import type { UserRole } from "@/types/user";
 
 type Params = { id: string };
 
-function isSuperadmin(role: AppRole | Role) {
+function isSuperadmin(role: AppRole | UserRole) {
   return role === "SUPERADMIN";
 }
+
+const USER_ROLES = {
+  SUPERADMIN: "SUPERADMIN",
+  ADMIN: "ADMIN",
+} as const;
 
 function isValidId(id: string) {
   return typeof id === "string" && id.length > 0;
@@ -81,7 +86,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
     lastName?: string;
     email?: string;
     passwordHash?: string;
-    role?: Role;
+    role?: UserRole;
     isActive?: boolean;
   };
   const data: PatchData = {};
@@ -98,8 +103,8 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
   if (typeof body.password === "string" && body.password.length >= 6) {
     data.passwordHash = await bcrypt.hash(body.password, 10);
   }
-  if (body.role === "SUPERADMIN") data.role = Role.SUPERADMIN;
-  if (body.role === "ADMIN") data.role = Role.ADMIN;
+  if (body.role === USER_ROLES.SUPERADMIN) data.role = USER_ROLES.SUPERADMIN;
+  if (body.role === USER_ROLES.ADMIN) data.role = USER_ROLES.ADMIN;
   if (typeof body.isActive === "boolean") data.isActive = body.isActive;
 
   if (Object.keys(data).length === 0) {

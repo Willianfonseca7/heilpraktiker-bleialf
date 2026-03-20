@@ -5,12 +5,17 @@ import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { Role } from "@prisma/client";
 import type { AppRole } from "@/lib/auth";
+import type { UserRole } from "@/types/user";
 
-function isSuperadmin(role: AppRole | Role) {
+function isSuperadmin(role: AppRole | UserRole) {
   return role === "SUPERADMIN";
 }
+
+const USER_ROLES = {
+  SUPERADMIN: "SUPERADMIN",
+  ADMIN: "ADMIN",
+} as const;
 
 export async function GET() {
   const session = await requireSession();
@@ -56,11 +61,9 @@ export async function POST(req: Request) {
   const email = typeof body.email === "string" ? body.email.trim() : "";
   const password = typeof body.password === "string" ? body.password : "";
   const role =
-    body.role === "SUPERADMIN"
-      ? Role.SUPERADMIN
-      : body.role === "ADMIN"
-      ? Role.ADMIN
-      : Role.ADMIN;
+    body.role === USER_ROLES.SUPERADMIN
+      ? USER_ROLES.SUPERADMIN
+      : USER_ROLES.ADMIN;
   const isActive = typeof body.isActive === "boolean" ? body.isActive : true;
 
   if (!firstName || !lastName || !email || !password) {

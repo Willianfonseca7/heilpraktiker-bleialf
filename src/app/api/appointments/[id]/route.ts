@@ -1,18 +1,24 @@
-import { AppointmentStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getDayBounds } from "@/lib/appointment-slots";
 import { sendAppointmentStatusEmail } from "@/lib/email";
 import { requireAdminSession } from "@/lib/session";
+import type { AppointmentStatus } from "@/types/user";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const APPOINTMENT_STATUS = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  CANCELED: "CANCELED",
+} as const;
+
 function isAppointmentStatus(value: string): value is AppointmentStatus {
   return (
-    value === AppointmentStatus.PENDING ||
-    value === AppointmentStatus.CONFIRMED ||
-    value === AppointmentStatus.CANCELED
+    value === APPOINTMENT_STATUS.PENDING ||
+    value === APPOINTMENT_STATUS.CONFIRMED ||
+    value === APPOINTMENT_STATUS.CANCELED
   );
 }
 
@@ -49,7 +55,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Anfrage nicht gefunden." }, { status: 404 });
   }
 
-  if (status === AppointmentStatus.CONFIRMED) {
+  if (status === APPOINTMENT_STATUS.CONFIRMED) {
     if (!existing.doctor || !existing.scheduledAt) {
       return NextResponse.json(
         { error: "Zur Bestaetigung werden Behandler und Terminzeit benoetigt." },
@@ -63,7 +69,7 @@ export async function PATCH(
       where: {
         id: { not: id },
         doctor: existing.doctor,
-        status: AppointmentStatus.CONFIRMED,
+        status: APPOINTMENT_STATUS.CONFIRMED,
         scheduledAt: {
           gte: start,
           lte: end,
@@ -90,7 +96,7 @@ export async function PATCH(
     where: { id },
     data: {
       status,
-      userHasUnreadStatusUpdate: status !== AppointmentStatus.PENDING,
+      userHasUnreadStatusUpdate: status !== APPOINTMENT_STATUS.PENDING,
     },
     include: {
       user: {
@@ -106,8 +112,8 @@ export async function PATCH(
 
   if (
     updated.user?.email &&
-    (status === AppointmentStatus.CONFIRMED ||
-      status === AppointmentStatus.CANCELED)
+    (status === APPOINTMENT_STATUS.CONFIRMED ||
+      status === APPOINTMENT_STATUS.CANCELED)
   ) {
     try {
       await sendAppointmentStatusEmail({

@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import {
@@ -9,6 +8,9 @@ import {
   SESSION_COOKIE_NAME,
 } from "@/lib/auth";
 import { sendRegistrationEmail } from "@/lib/email";
+import type { UserRole } from "@/types/user";
+
+const DEFAULT_USER_ROLE: UserRole = "USER";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
         lastName,
         email,
         passwordHash,
-        role: "USER" as unknown as Role,
+        role: DEFAULT_USER_ROLE,
         isActive: true,
       },
     });

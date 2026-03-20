@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { HealthCheckLevel } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { requireSession } from "@/lib/session";
 import type {
@@ -44,24 +43,24 @@ function isHealthCheckResult(value: unknown): value is HealthCheckResult {
   );
 }
 
-function toPrismaLevel(level: HealthCheckResult["level"]): HealthCheckLevel {
+function toPrismaLevel(level: HealthCheckResult["level"]): PrismaHealthCheckLevel {
   switch (level) {
     case "low":
-      return HealthCheckLevel.LOW;
+      return HEALTH_CHECK_LEVEL.LOW;
     case "medium":
-      return HealthCheckLevel.MEDIUM;
+      return HEALTH_CHECK_LEVEL.MEDIUM;
     case "high":
-      return HealthCheckLevel.HIGH;
+      return HEALTH_CHECK_LEVEL.HIGH;
   }
 }
 
-function toAppLevel(level: HealthCheckLevel): HealthCheckResult["level"] {
+function toAppLevel(level: PrismaHealthCheckLevel): HealthCheckResult["level"] {
   switch (level) {
-    case HealthCheckLevel.LOW:
+    case HEALTH_CHECK_LEVEL.LOW:
       return "low";
-    case HealthCheckLevel.MEDIUM:
+    case HEALTH_CHECK_LEVEL.MEDIUM:
       return "medium";
-    case HealthCheckLevel.HIGH:
+    case HEALTH_CHECK_LEVEL.HIGH:
       return "high";
   }
 }
@@ -171,3 +170,11 @@ export async function POST(req: Request) {
     },
   });
 }
+const HEALTH_CHECK_LEVEL = {
+  LOW: "LOW",
+  MEDIUM: "MEDIUM",
+  HIGH: "HIGH",
+} as const;
+
+type PrismaHealthCheckLevel =
+  (typeof HEALTH_CHECK_LEVEL)[keyof typeof HEALTH_CHECK_LEVEL];

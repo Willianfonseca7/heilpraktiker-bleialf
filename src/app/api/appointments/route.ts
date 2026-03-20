@@ -1,4 +1,3 @@
-import { AppointmentStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import {
   getPractitionersForTreatment,
@@ -8,9 +7,16 @@ import {
 import { prisma } from "@/lib/db";
 import { ensurePatientExistsForSession } from "@/lib/service/patient.service";
 import { requireSession } from "@/lib/session";
+import type { AppointmentStatus } from "@/types/user";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const APPOINTMENT_STATUS = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  CANCELED: "CANCELED",
+} as const;
 
 function toAppStatus(status: AppointmentStatus) {
   return status;
@@ -139,7 +145,7 @@ export async function POST(req: Request) {
         treatment,
         doctor: doctor || null,
         message: message || null,
-        status: AppointmentStatus.PENDING,
+        status: APPOINTMENT_STATUS.PENDING,
         scheduledAt,
         userHasUnreadStatusUpdate: false,
       },
