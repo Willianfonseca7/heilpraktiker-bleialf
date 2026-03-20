@@ -16,6 +16,9 @@ export function FeatureCard({
   buttonLabel,
   imageObjectPosition,
 }: FeatureCardProps) {
+  const primaryHref =
+    items.map((item) => getTreatmentCardHref(item)).find(Boolean) ?? href;
+
   return (
     <Box
       sx={{
@@ -60,12 +63,16 @@ export function FeatureCard({
           {title}
         </Typography>
         <Box component="ul" sx={{ m: 0, pl: 2, color: "text.secondary" }}>
-          {items.map((item) => (
-            <Box component="li" key={item} sx={{ mb: 0.5 }}>
-              {getTreatmentCardHref(item) ? (
+          {items.map((item) => {
+            const itemHref = getTreatmentCardHref(item);
+
+            return (
+              <Box component="li" key={item} sx={{ mb: 0.5 }}>
+                {itemHref ? (
                 <Box
                   component={Link}
-                  href={getTreatmentCardHref(item) ?? "#"}
+                  href={itemHref}
+                  aria-label={`${item} in Behandlungen ansehen`}
                   sx={{
                     color: "inherit",
                     textDecoration: "none",
@@ -82,17 +89,18 @@ export function FeatureCard({
               ) : (
                 item
               )}
-            </Box>
-          ))}
+              </Box>
+            );
+          })}
         </Box>
         {buttonLabel && (
-          href ? (
+          primaryHref ? (
             <Button
               variant="text"
               color="primary"
               sx={{ justifySelf: "start", fontWeight: 700, px: 0 }}
               component={Link}
-              href={href}
+              href={primaryHref}
             >
               {buttonLabel}
             </Button>

@@ -17,13 +17,21 @@ export default function BehandlungItem({
   const itemId = slugifyTreatment(title);
   const [open, setOpen] = useState(false);
   const preferredTreatment = normalizeClinicTreatment(title);
+  const contentId = `${itemId}-content`;
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") return undefined;
 
-    if (window.location.hash === `#${itemId}`) {
-      setOpen(true);
-    }
+    const syncOpenState = () => {
+      setOpen(window.location.hash === `#${itemId}`);
+    };
+
+    syncOpenState();
+    window.addEventListener("hashchange", syncOpenState);
+
+    return () => {
+      window.removeEventListener("hashchange", syncOpenState);
+    };
   }, [itemId]);
 
   return (
@@ -31,49 +39,51 @@ export default function BehandlungItem({
       id={itemId}
       className="scroll-mt-28 rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-emerald-200 hover:shadow-sm"
     >
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
-        >
-          <span className="text-base font-semibold text-gray-900">{title}</span>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls={contentId}
+        className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+      >
+        <span className="text-base font-semibold text-gray-900">{title}</span>
 
-          <span
-            className={`flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg text-gray-500 transition-all duration-300 ${
-              open ? "rotate-45 bg-gray-50 text-gray-900" : ""
-            }`}
-          >
-            +
-          </span>
-        </button>
-
-        <div
-          className={`grid transition-all duration-300 ease-in-out ${
-            open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        <span
+          className={`flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-lg text-gray-500 transition-all duration-300 ${
+            open ? "rotate-45 bg-gray-50 text-gray-900" : ""
           }`}
         >
-          <div className="overflow-hidden">
-            <div className="px-6 pb-6">
-              <div className="mb-4 h-px w-full bg-gray-100" />
-              <p className="text-sm leading-7 text-gray-600">{description}</p>
-              <AppointmentCTA
-                defaultTreatment={preferredTreatment}
-                preferredTreatments={[preferredTreatment]}
-              >
-                {({ onClick, disabled }) => (
-                  <button
-                    type="button"
-                    onClick={onClick}
-                    disabled={disabled}
-                    className="mt-5 inline-flex rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {disabled ? "Wird geprüft..." : "Termin online buchen"}
-                  </button>
-                )}
-              </AppointmentCTA>
-            </div>
+          +
+        </span>
+      </button>
+
+      <div
+        className={`grid transition-all duration-300 ease-in-out ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div id={contentId} className="overflow-hidden">
+          <div className="px-6 pb-6">
+            <div className="mb-4 h-px w-full bg-gray-100" />
+            <p className="text-sm leading-7 text-gray-600">{description}</p>
+            <AppointmentCTA
+              defaultTreatment={preferredTreatment}
+              preferredTreatments={[preferredTreatment]}
+            >
+              {({ onClick, disabled }) => (
+                <button
+                  type="button"
+                  onClick={onClick}
+                  disabled={disabled}
+                  className="mt-5 inline-flex rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {disabled ? "Wird geprüft..." : "Termin online buchen"}
+                </button>
+              )}
+            </AppointmentCTA>
           </div>
         </div>
       </div>
+    </div>
   );
 }
