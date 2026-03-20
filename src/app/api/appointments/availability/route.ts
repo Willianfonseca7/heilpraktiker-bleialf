@@ -48,7 +48,7 @@ export async function GET(req: Request) {
       .map((appointment: TakenAppointmentRecord) =>
         appointment.scheduledAt ? formatSlotFromDate(appointment.scheduledAt) : null
       )
-      .filter((slot): slot is string => Boolean(slot));
+      .filter((slot: string | null): slot is string => Boolean(slot));
 
     return NextResponse.json({
       slots: APPOINTMENT_TIME_SLOTS,
