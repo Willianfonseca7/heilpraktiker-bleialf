@@ -98,6 +98,10 @@ export async function GET(_: Request, { params }: { params: Params }) {
         : Promise.resolve([]),
     ]);
 
+    type PatientAppointmentRecord = (typeof appointments)[number];
+    type PatientHealthCheckRecord = (typeof healthChecks)[number];
+    type PatientContactMessageRecord = (typeof contactMessages)[number];
+
     return NextResponse.json(
       {
         patient: {
@@ -108,7 +112,7 @@ export async function GET(_: Request, { params }: { params: Params }) {
           phone: patient.phone,
           createdAt: patient.createdAt.toISOString(),
         },
-        appointments: appointments.map((appointment) => ({
+        appointments: appointments.map((appointment: PatientAppointmentRecord) => ({
           id: appointment.id,
           treatment: appointment.treatment,
           doctor: appointment.doctor,
@@ -118,7 +122,7 @@ export async function GET(_: Request, { params }: { params: Params }) {
           createdAt: appointment.createdAt.toISOString(),
           updatedAt: appointment.updatedAt.toISOString(),
         })),
-        healthChecks: healthChecks.map((result) => ({
+        healthChecks: healthChecks.map((result: PatientHealthCheckRecord) => ({
           id: result.id,
           clientResultId: result.clientResultId,
           totalScore: result.totalScore,
@@ -128,7 +132,7 @@ export async function GET(_: Request, { params }: { params: Params }) {
           recommendations: result.recommendations as string[],
           createdAt: result.createdAt.toISOString(),
         })),
-        contactMessages: contactMessages.map((message) => ({
+        contactMessages: contactMessages.map((message: PatientContactMessageRecord) => ({
           id: message.id,
           firstName: message.firstName,
           lastName: message.lastName,

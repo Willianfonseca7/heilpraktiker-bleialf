@@ -84,8 +84,10 @@ export async function GET() {
     },
   });
 
+  type SavedHealthCheckResult = (typeof results)[number];
+
   return NextResponse.json({
-    results: results.map((result) => ({
+    results: results.map((result: SavedHealthCheckResult) => ({
       id: result.id,
       clientResultId: result.clientResultId,
       totalScore: result.totalScore,
