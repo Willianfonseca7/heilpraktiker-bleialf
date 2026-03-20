@@ -2,7 +2,7 @@
 
 import { useMemo, useState, type PropsWithChildren } from "react";
 import { navigationItems } from "../config/site";
-import { AppContext, type AppPreferences } from "./AppContext";
+import { AppContext, type AppPreferences } from "./appContext";
 
 export function AppProvider({ children }: PropsWithChildren) {
   const [preferences, setPreferences] = useState<AppPreferences>({ language: "de" });
