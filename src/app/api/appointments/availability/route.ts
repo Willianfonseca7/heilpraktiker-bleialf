@@ -42,8 +42,10 @@ export async function GET(req: Request) {
       },
     });
 
+    type TakenAppointmentRecord = (typeof takenAppointments)[number];
+
     const unavailableSlots = takenAppointments
-      .map((appointment) =>
+      .map((appointment: TakenAppointmentRecord) =>
         appointment.scheduledAt ? formatSlotFromDate(appointment.scheduledAt) : null
       )
       .filter((slot): slot is string => Boolean(slot));
