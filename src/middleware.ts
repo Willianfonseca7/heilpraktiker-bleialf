@@ -8,6 +8,9 @@ function isAdminHost(host: string) {
   if (host.startsWith("admin.")) return true;
   if (host.startsWith("localhost")) return true;
   if (host.startsWith("127.0.0.1")) return true;
+  if (host.endsWith(".vercel.app")) return true;
+  if (host === "praxis-demo.de") return true;
+  if (host === "www.praxis-demo.de") return true;
   return false;
 }
 
