@@ -36,9 +36,9 @@ export default function AdminUserModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl">
-        <div className="mb-5 flex items-start justify-between gap-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 md:items-center md:py-8">
+      <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-xl md:max-h-[calc(100vh-4rem)]">
+        <div className="mb-5 flex shrink-0 items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-slate-900">
               {mode === "edit" ? "Admin bearbeiten" : "Neuen Admin erstellen"}
@@ -58,13 +58,15 @@ export default function AdminUserModal({
           </button>
         </div>
 
-        <AdminUserForm
-          mode={mode}
-          initialData={initialData ?? undefined}
-          submitting={submitting}
-          onSubmit={onSubmit}
-          onCancel={onClose}
-        />
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          <AdminUserForm
+            mode={mode}
+            initialData={initialData ?? undefined}
+            submitting={submitting}
+            onSubmit={onSubmit}
+            onCancel={onClose}
+          />
+        </div>
       </div>
     </div>
   );

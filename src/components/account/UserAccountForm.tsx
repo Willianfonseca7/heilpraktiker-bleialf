@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import PasswordInput from "@/components/ui/PasswordInput";
 import type { UserRole } from "@/types/user";
 
 export type UserAccountFormValues = {
@@ -121,19 +122,14 @@ export default function UserAccountForm({
         />
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700">
-          Passwort {mode === "edit" ? "(optional)" : ""}
-        </label>
-        <input
-          type="password"
-          className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-slate-200"
-          placeholder={mode === "edit" ? "Neues Passwort" : "Passwort"}
-          value={form.password}
-          onChange={setField("password")}
-          required={mode === "create"}
-        />
-      </div>
+      <PasswordInput
+        label={`Passwort ${mode === "edit" ? "(optional)" : ""}`.trim()}
+        inputClassName="border-gray-300 text-sm text-slate-900"
+        placeholder={mode === "edit" ? "Neues Passwort" : "Passwort"}
+        value={form.password}
+        onChange={setField("password")}
+        required={mode === "create"}
+      />
 
       {showRoleField || showActiveField ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

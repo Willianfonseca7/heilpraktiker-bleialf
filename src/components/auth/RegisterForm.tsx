@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 type RegisterFormProps = {
   onSwitchToLogin: () => void;
@@ -72,7 +73,7 @@ export default function RegisterForm({
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4 pb-4" onSubmit={handleSubmit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Vorname</label>
@@ -110,29 +111,19 @@ export default function RegisterForm({
         />
       </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">Passwort</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-teal-600"
-        />
-      </div>
+      <PasswordInput
+        label="Passwort"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="••••••••"
+      />
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">
-          Passwort bestätigen
-        </label>
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="••••••••"
-          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-teal-600"
-        />
-      </div>
+      <PasswordInput
+        label="Passwort bestätigen"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="••••••••"
+      />
 
       <div className="flex items-start gap-3 rounded-2xl bg-gray-50 p-4">
         <input
@@ -157,24 +148,26 @@ export default function RegisterForm({
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full rounded-xl bg-teal-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-teal-700 disabled:opacity-50"
-      >
-        {isSubmitting ? "Wird erstellt..." : "Konto erstellen"}
-      </button>
-
-      <p className="text-center text-sm text-gray-600">
-        Bereits registriert?{" "}
+      <div className="sticky bottom-0 -mx-1 space-y-4 bg-white px-1 pb-1 pt-2">
         <button
-          type="button"
-          onClick={onSwitchToLogin}
-          className="font-medium text-teal-700 hover:underline"
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full rounded-xl bg-teal-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-teal-700 disabled:opacity-50"
         >
-          Jetzt anmelden
+          {isSubmitting ? "Wird erstellt..." : "Konto erstellen"}
         </button>
-      </p>
+
+        <p className="text-center text-sm text-gray-600">
+          Bereits registriert?{" "}
+          <button
+            type="button"
+            onClick={onSwitchToLogin}
+            className="font-medium text-teal-700 hover:underline"
+          >
+            Jetzt anmelden
+          </button>
+        </p>
+      </div>
     </form>
   );
 }

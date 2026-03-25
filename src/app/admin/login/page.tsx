@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -45,12 +46,12 @@ export default function AdminLogin() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <input
-          type="password"
+        <PasswordInput
           placeholder="Passwort"
-          className="border p-2 w-full"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          inputClassName="rounded-none border p-2 text-base focus:border-gray-400 focus:ring-0"
+          containerClassName=""
         />
 
         <button type="submit" className="bg-emerald-600 text-white p-2 w-full hover:bg-emerald-700">

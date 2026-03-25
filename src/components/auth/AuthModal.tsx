@@ -45,7 +45,13 @@ export default function AuthModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+    <div
+      className="fixed inset-0 z-50 flex min-h-[100dvh] items-start justify-center overflow-y-auto px-4 md:items-center md:py-8"
+      style={{
+        paddingTop: "max(1rem, calc(env(safe-area-inset-top) + 1rem))",
+        paddingBottom: "max(1rem, calc(env(safe-area-inset-bottom) + 1rem))",
+      }}
+    >
       <button
         type="button"
         aria-label="Modal schließen"
@@ -53,8 +59,14 @@ export default function AuthModal({
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl md:p-8">
-        <div className="mb-6 flex items-start justify-between gap-4">
+      <div
+        className="relative z-10 flex w-full max-w-lg flex-col overflow-hidden rounded-3xl bg-white p-6 shadow-2xl md:max-h-[calc(100vh-4rem)] md:p-8"
+        style={{
+          maxHeight:
+            "calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom))",
+        }}
+      >
+        <div className="mb-6 flex shrink-0 items-start justify-between gap-4">
           <div className="space-y-2">
             <span className="inline-flex rounded-full bg-teal-100 px-4 py-1 text-sm font-medium text-teal-700">
               {mode === "register" ? "Registrierung" : "Anmeldung"}
@@ -83,7 +95,7 @@ export default function AuthModal({
           </button>
         </div>
 
-        <div className="mb-6 flex rounded-2xl bg-gray-100 p-1">
+        <div className="mb-6 flex shrink-0 rounded-2xl bg-gray-100 p-1">
           <button
             type="button"
             onClick={() => onSwitchMode("register")}
@@ -109,17 +121,19 @@ export default function AuthModal({
           </button>
         </div>
 
-        {mode === "register" ? (
-          <RegisterForm
-            onSwitchToLogin={() => onSwitchMode("login")}
-            onSuccess={onAuthSuccess}
-          />
-        ) : (
-          <LoginForm
-            onSwitchToRegister={() => onSwitchMode("register")}
-            onSuccess={onAuthSuccess}
-          />
-        )}
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          {mode === "register" ? (
+            <RegisterForm
+              onSwitchToLogin={() => onSwitchMode("login")}
+              onSuccess={onAuthSuccess}
+            />
+          ) : (
+            <LoginForm
+              onSwitchToRegister={() => onSwitchMode("register")}
+              onSuccess={onAuthSuccess}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
