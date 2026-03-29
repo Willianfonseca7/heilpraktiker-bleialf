@@ -8,6 +8,7 @@ import {
   signSession,
   SESSION_COOKIE_NAME,
 } from "@/lib/auth";
+import { sendLoginSuccessEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -78,6 +79,16 @@ export async function POST(req: Request) {
     });
 
     response.cookies.set(SESSION_COOKIE_NAME, token, getSessionCookieOptions(maxAge));
+
+    try {
+      await sendLoginSuccessEmail({
+        to: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
+    } catch (error) {
+      console.error("Failed to send login success email", error);
+    }
 
     return response;
   } catch {

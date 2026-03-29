@@ -5,6 +5,7 @@ import {
   isValidPractitionerForTreatment,
 } from "@/data/clinic-offerings";
 import { prisma } from "@/lib/db";
+import { sendAppointmentRequestReceivedEmail } from "@/lib/email";
 import { ensurePatientExistsForSession } from "@/lib/service/patient.service";
 import { requireSession } from "@/lib/session";
 import type { AppointmentStatus } from "@/types/user";
@@ -163,6 +164,18 @@ export async function POST(req: Request) {
         updatedAt: true,
       },
     });
+
+    try {
+      await sendAppointmentRequestReceivedEmail({
+        to: session.email,
+        firstName: session.firstName,
+        treatment: created.treatment,
+        doctor: created.doctor,
+        scheduledAt: created.scheduledAt,
+      });
+    } catch (error) {
+      console.error("Failed to send appointment request email", error);
+    }
 
     return NextResponse.json(
       {
