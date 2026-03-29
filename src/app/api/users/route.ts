@@ -58,7 +58,8 @@ export async function POST(req: Request) {
     typeof body.firstName === "string" ? body.firstName.trim() : "";
   const lastName =
     typeof body.lastName === "string" ? body.lastName.trim() : "";
-  const email = typeof body.email === "string" ? body.email.trim() : "";
+  const email =
+    typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const password = typeof body.password === "string" ? body.password : "";
   const role =
     body.role === USER_ROLES.SUPERADMIN
@@ -70,6 +71,25 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: "Vorname, Nachname, E-Mail und Passwort sind erforderlich" },
       { status: 400 }
+    );
+  }
+
+  if (password.length < 6) {
+    return NextResponse.json(
+      { error: "Passwort muss mindestens 6 Zeichen lang sein." },
+      { status: 400 }
+    );
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
+
+  if (existingUser) {
+    return NextResponse.json(
+      { error: "E-Mail ist bereits vergeben." },
+      { status: 409 }
     );
   }
 

@@ -98,14 +98,37 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
     data.lastName = body.lastName.trim();
   }
   if (typeof body.email === "string" && body.email.trim()) {
-    data.email = body.email.trim();
+    data.email = body.email.trim().toLowerCase();
   }
-  if (typeof body.password === "string" && body.password.length >= 6) {
-    data.passwordHash = await bcrypt.hash(body.password, 10);
+  if (typeof body.password === "string") {
+    if (body.password.length > 0 && body.password.length < 6) {
+      return NextResponse.json(
+        { error: "Passwort muss mindestens 6 Zeichen lang sein." },
+        { status: 400 }
+      );
+    }
+
+    if (body.password.length >= 6) {
+      data.passwordHash = await bcrypt.hash(body.password, 10);
+    }
   }
   if (body.role === USER_ROLES.SUPERADMIN) data.role = USER_ROLES.SUPERADMIN;
   if (body.role === USER_ROLES.ADMIN) data.role = USER_ROLES.ADMIN;
   if (typeof body.isActive === "boolean") data.isActive = body.isActive;
+
+  if (data.email) {
+    const emailOwner = await prisma.user.findUnique({
+      where: { email: data.email },
+      select: { id: true },
+    });
+
+    if (emailOwner && emailOwner.id !== id) {
+      return NextResponse.json(
+        { error: "E-Mail ist bereits vergeben." },
+        { status: 409 }
+      );
+    }
+  }
 
   if (Object.keys(data).length === 0) {
     return NextResponse.json(

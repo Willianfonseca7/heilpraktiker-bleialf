@@ -202,6 +202,10 @@ export function Header({
         ];
       }
 
+      if (role === "ADMIN") {
+        return [{ label: "Patientenverwaltung", path: "/patients" }];
+      }
+
       return [];
     },
     [role]

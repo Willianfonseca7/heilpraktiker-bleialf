@@ -9,8 +9,6 @@ type Props = {
 };
 
 export default function AdminUsersTable({ users, loading, onEdit, onDelete }: Props) {
-  const now = Date.now();
-
   return (
     <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
       <div className="max-h-[520px] overflow-auto">
@@ -54,9 +52,7 @@ export default function AdminUsersTable({ users, loading, onEdit, onDelete }: Pr
                     <UserRoleBadge role={user.role} />
                   </td>
                   <td className="px-5 py-3">
-                    {user.isActive &&
-                    user.sessionExpiresAt &&
-                    new Date(user.sessionExpiresAt).getTime() > now ? (
+                    {user.isActive ? (
                       <span className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
                         Aktiv
                       </span>

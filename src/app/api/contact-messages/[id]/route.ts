@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/session";
+import { requireAdminSession } from "@/lib/session";
 import { updateContactMessageReadState } from "@/lib/service/contact-message.service";
 
 type Params = { id: string };
@@ -12,7 +12,7 @@ export async function PATCH(
   { params }: { params: Params }
 ) {
   try {
-    const session = await requireSession();
+    const session = await requireAdminSession();
     if (session instanceof NextResponse) return session;
 
     const id = params?.id;
