@@ -1,4 +1,3 @@
-// src/lib/service/patient.service.ts
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import type { SessionPayload } from "@/lib/auth";
@@ -18,7 +17,7 @@ export async function listPatients() {
     lastName: p.lastName,
     email: p.email,
     phone: p.phone,
-    createdAt: p.createdAt.toISOString(), // ✅ serializável
+    createdAt: p.createdAt.toISOString(),
   }));
 
   const count = await prisma.patient.count();

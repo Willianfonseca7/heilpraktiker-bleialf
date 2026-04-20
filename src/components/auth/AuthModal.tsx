@@ -1,4 +1,3 @@
-// src/components/auth/AuthModal.tsx
 "use client";
 
 import { useEffect } from "react";

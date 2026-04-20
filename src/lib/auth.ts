@@ -1,4 +1,3 @@
-// src/lib/auth.ts
 export type AppRole = "USER" | "ADMIN" | "SUPERADMIN";
 
 export type SessionPayload = {

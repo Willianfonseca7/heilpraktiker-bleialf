@@ -1,4 +1,3 @@
-// src/app/patients/page.tsx
 import { listContactMessages } from "@/lib/service/contact-message.service";
 import { listPatients } from "@/lib/service/patient.service";
 import PatientsDashboard from "@/components/ui/patients-dashboard";
