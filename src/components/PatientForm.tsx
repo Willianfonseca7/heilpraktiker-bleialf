@@ -28,7 +28,6 @@ function validate(values: PatientFormValues) {
   else if (!/^\S+@\S+\.\S+$/.test(values.email))
     errors.email = "Ungültige E-Mail.";
 
-  // Telefon optional, aber falls vorhanden, Mindestlänge prüfen
   if (values.phone && values.phone.replace(/\s/g, "").length < 6)
     errors.phone = "Telefon scheint ungültig.";
 
@@ -87,7 +86,6 @@ export default function PatientForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Name */}
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
           Name
@@ -105,7 +103,6 @@ export default function PatientForm({
         ) : null}
       </div>
 
-      {/* E-Mail */}
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
           E-Mail
@@ -123,7 +120,6 @@ export default function PatientForm({
         ) : null}
       </div>
 
-      {/* Telefon */}
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
           Telefon (optional)
@@ -141,9 +137,7 @@ export default function PatientForm({
         ) : null}
       </div>
 
-      {/* 2 Spalten */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Geburtsdatum */}
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
             Geburtsdatum
@@ -163,7 +157,6 @@ export default function PatientForm({
           ) : null}
         </div>
 
-        {/* Krankenversicherung */}
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
             Krankenversicherung
@@ -189,7 +182,6 @@ export default function PatientForm({
         </div>
       </div>
 
-      {/* Aktionen */}
       <div className="flex items-center justify-end gap-2 pt-2">
         <button
           type="button"

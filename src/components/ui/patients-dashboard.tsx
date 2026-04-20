@@ -18,8 +18,6 @@ type Patient = {
   email: string | null;
   phone?: string | null;
   createdAt: string | Date;
-
-  // campos novos do formulário (podem não existir nos pacientes vindos do banco)
   birthDate?: string; // yyyy-mm-dd
   insurancePlan?: string; // gesetzlich | privat | selbstzahler | etc
 };
@@ -54,15 +52,11 @@ export default function PatientsDashboard({
   total,
   contactMessages,
 }: PatientsDashboardProps) {
-  // Copia local para poder adicionar via modal (sem backend por enquanto)
   const [items, setItems] = useState<Patient[]>(patients ?? []);
   const [query, setQuery] = useState("");
   const router = useRouter();
-
-  // Modal Create
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  // Se o server enviar novos pacientes, sincroniza
   useEffect(() => {
     setItems(patients ?? []);
   }, [patients]);
@@ -80,7 +74,6 @@ export default function PatientsDashboard({
     });
   }, [items, query]);
 
-  // KPIs
   const totalPatients = useMemo(() => items.length, [items.length]);
 
   const newToday = useMemo(() => {
@@ -109,7 +102,6 @@ export default function PatientsDashboard({
     )[0];
   }, [contactMessages]);
 
-  // Create handler (persist in backend)
   const handleCreatePatient = async (values: {
   name: string;
   email: string;
@@ -162,13 +154,11 @@ export default function PatientsDashboard({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      {/* Title */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Patientenverwaltung</h1>
         <p className="mt-1 text-sm text-gray-500">Patientenübersicht (Demo)</p>
       </div>
 
-      {/* KPI cards */}
       <div className="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Gesamtanzahl der Patienten</p>
@@ -216,7 +206,6 @@ export default function PatientsDashboard({
         </div>
       </div>
 
-      {/* Search + Create button */}
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-xl">
           <input
@@ -236,10 +225,8 @@ export default function PatientsDashboard({
         </button>
       </div>
 
-      {/* Counter */}
       <div className="mb-3 text-sm text-gray-500">{filteredPatients.length} Ergebnisse gefunden</div>
 
-      {/* Table */}
       <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
         <div className="max-h-[420px] overflow-auto">
           <table className="w-full table-auto">
@@ -285,12 +272,8 @@ export default function PatientsDashboard({
           </table>
         </div>
 
-        <div className="border-t px-5 py-3 text-xs text-gray-500">
-          Hinweis: Diese Suche ist clientseitig (schnell). Später können wir auf Paginierung + serverseitige Filter erweitern.
-        </div>
       </div>
 
-      {/* Modal Create */}
       <Modal
         isOpen={isCreateOpen}
         title="Neuer Patient"

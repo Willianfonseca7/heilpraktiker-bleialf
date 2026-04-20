@@ -29,7 +29,6 @@ export async function POST(req: Request) {
     const result = await createPatient(input);
     return created(result);
   } catch (error: unknown) {
-    // se email unique estourar, Prisma joga erro -> você pode tratar depois
     return serverError("Failed to create patient", getErrorMessage(error));
   }
 }
